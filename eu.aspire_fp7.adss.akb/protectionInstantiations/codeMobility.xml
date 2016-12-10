@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (c) 2016 Politecnico di Torino.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+   
+    Contributors:
+        Politecnico di Torino - initial API and implementation
+ -->
+
+<protectionInstantiationsList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://protectionInstantiation.akb.adss.aspire_fp7.eu" xsi:schemaLocation="../schema/protectionInstantiation.xsd">
+	<protectionInstantiation>
+		<protectionInstantiationName>Code Mobility</protectionInstantiationName>
+		<protectionName>codeMobility</protectionName>
+		<codeRegionAnnotation>code_mobility,status(mobile)</codeRegionAnnotation>
+		<clientTimeOverhead>1.005</clientTimeOverhead>
+ 		<clientMemoryOverhead>#nr_of_mobile_blocks# * (sizeof(void*) * 2 + sizeof(pthread_mutex_t) + sizeof(size_t))</clientMemoryOverhead>
+		<serverTimeOverhead>1</serverTimeOverhead>
+ 		<serverMemoryOverhead>#nr_of_mobile_blocks# * #avg_block_size#</serverMemoryOverhead>
+ 		<networkOverhead>#nr_of_mobile_blocks# * #avg_block_size#</networkOverhead>
+	</protectionInstantiation>
+</protectionInstantiationsList>

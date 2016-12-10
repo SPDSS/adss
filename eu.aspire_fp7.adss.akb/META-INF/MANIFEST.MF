@@ -1,0 +1,29 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: ADSS AKB
+Bundle-SymbolicName: eu.aspire_fp7.adss.akb;singleton:=true
+Bundle-Version: 0.0.1.qualifier
+Bundle-ClassPath: .
+Bundle-Vendor: Politecnico di Torino
+Bundle-Localization: plugin
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Export-Package: eu.aspire_fp7.adss.akb,
+ eu.aspire_fp7.adss.akb.impl,
+ eu.aspire_fp7.adss.akb.protectioninstantiation,
+ eu.aspire_fp7.adss.akb.util
+Require-Bundle: org.eclipse.core.resources;bundle-version="3.7.101",
+ org.eclipse.core.runtime;bundle-version="3.7.0",
+ it.polito.security.ontologies;bundle-version="0.2.0",
+ eu.aspire_fp7.adss.util;bundle-version="0.0.1",
+ org.eclipse.emf.ecore;bundle-version="2.8.3";visibility:=reexport,
+ org.eclipse.xtext.xbase.lib;bundle-version="2.3.1",
+ org.eclipse.emf.ecore.xcore.lib,
+ org.eclipse.core.databinding;bundle-version="1.4.0",
+ org.eclipse.core.databinding.beans;bundle-version="1.2.100",
+ org.eclipse.core.databinding.observable;bundle-version="1.4.0",
+ org.eclipse.core.databinding.property;bundle-version="1.4.0",
+ org.eclipse.jface.databinding;bundle-version="1.5.0",
+ com.ibm.icu;bundle-version="4.4.2",
+ org.eclipse.emf.ecore.xcore;bundle-version="1.3.1"
+Bundle-ActivationPolicy: lazy
+Bundle-Activator: eu.aspire_fp7.adss.akb.Activator

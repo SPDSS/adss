@@ -1,0 +1,8 @@
+https://dabuttonfactory.com/
+	font: open sans bold 13pt white
+	text shadow: distance 1px black
+	size: adapted to text h 6 px v 2px
+	style: round box
+	background: simple gradient
+	border: no
+	shadow: no

@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='utf-8' ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	</head>
+	<body>
+		<h1 id="First_level_protections_evaluation_process">First level protections evaluation process</h1>
+		<p>Notation:</p>
+		<ul>
+			<li>metric(i, j) indicates the i-th metric for the j-th solution</li>
+		</ul>
+		<p>Initialization phase:</p>
+		<ol>
+			<li>prune the protection instantiations (too much overhead, ...)</li>
+			<li>prune the attack paths (too much difficult, ...)</li>
+			<li>call the ACTC to extract the metrics for all the possible solutions containing only one PO
+				<ul>
+					<li>if we have n assets and m PIs, there are at most n * m solutions</li>
+					<li>example: n = 10 and m = 14 * 5 lead to 700 solutions -- if an ACTC compilation takes 1 minute, this lasts for 700 minutes = 11.7 hours </li>
+					<li>in a real scenario there are far less solutions because no protection can be applied everywhere</li>
+				</ul>
+			</li>
+			<li>generate some random, but valid, solutions (adequately spaced) and extract their metrics</li>
+			<li>solve the linear approximation problem</li>
+		</ol>
+		<p>	a</p>
+	</body>
+</html>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (c) 2016 Politecnico di Torino.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+   
+    Contributors:
+        Politecnico di Torino - initial API and implementation
+ -->
+
+<protectionInstantiationsList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://protectionInstantiation.akb.adss.aspire_fp7.eu" xsi:schemaLocation="../schema/protectionInstantiation.xsd">
+	<!--
+	     * The overhead is as always an approximation, but in this case I think you could almost approximate it with 1.0005 or so, or measuring the exact value on one benchmark ;-)
+	     * This computation here DOES NOT SUPPORT call_depth. Taking into account call_depth would be too hard: it would depend on the size of call tree below that particular function
+	     * The approximations made here are:
+	       - you only have 1 such region/annotation per source function. IMPORTANT: in the source, the call_stack_check annotation should span the entire function!
+	       - this will correspond exactly to one call stack check being inserted by Diablo.
+	       - Still, the #nr_bbls_dynamic_size# gives not the number of function calls of the annotated region. So an ESTIMATE: the number of function calls is ~~ #nr_bbls_dynamic_size# / 8. This
+	         should be measured!
+	       The above assumptions are not really correct, but I think it should be close enough in practice.
+
+	       We have two versions of the call stack check, but the largest one inserts 6 instructions, we'll take that as upper bound.
+	-->
+	<protectionInstantiation>
+		<protectionInstantiationName>Call Stack Checks</protectionInstantiationName>
+		<protectionName>callStackChecks</protectionName>
+		<codeRegionAnnotation>call_stack_check</codeRegionAnnotation>
+		<clientTimeOverhead>1 + (6 * #nr_bbls_dynamic_size# / 8) * #nr_insts_dynamic_size#</clientTimeOverhead>
+ 		<clientMemoryOverhead>1</clientMemoryOverhead>
+		<serverTimeOverhead>1</serverTimeOverhead>
+ 		<serverMemoryOverhead>1</serverMemoryOverhead>
+ 		<networkOverhead>1</networkOverhead>
+	</protectionInstantiation>
+</protectionInstantiationsList>

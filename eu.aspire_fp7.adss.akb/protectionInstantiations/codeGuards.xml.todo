@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<protectionInstantiationsList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://protectionInstantiation.akb.adss.aspire_fp7.eu" xsi:schemaLocation="../schema/protectionInstantiation.xsd">
+	<!-- Some notes for Daniele :-)
+	     * the overhead is an *approximation*, for which I'll be using an additional metric called #nr_bbls_static#, #nr_bbls_dynamic_size# and #nr_bbls_dynamic#. However, these are not yet supported by the metrics
+	       but you can approximate both by nr_ins_static/8 and nr_ins_dynamic/8 etc.
+	     * So Code Guards consists of multiple annotations:
+	       - protection(guarded_region,label(this_is_custom_region_name))
+	       - protection(guard_attestator,label(this_is_an_attestator_name),regions(refers to for example this_is_custom_region_name))
+	       - protection(guard_verifier,attestator(refers to for example this_is_an_attestator_name))
+	     * The overhead of guarded_region is 0!
+	     * However, the overhead of the guard_verifier depends on the SIZE of the region it refers to in the regions part....
+	       So the execution time overhead (in instructions) for guard_attestator will be switch cost + overhead_per_byte_checked * regios_size
+	       Current estimates:
+	       switch_cost = 25
+	       overhead_per_byte_checked = 7
+	       
+	       And each is executed right now (as far as I know!) every time the BBL is executed, but I might have to double check this
+	       Right now I make the simplifying assumption that the region here contains only a single BBL, and thus that nr_bbls_dynamic_size corresponds to the number of times
+	       this check will be executed, but that might be wrong...
+
+	       =>
+	       clientTimeOverhead = 1 + (switch_cost + overhead_per_byte_checked * #nr_bbls_static OF THE REFERRED TO REGION# * #nr_bbls_dynamic_size# ) / #nr_ins_dynamic_size#
+
+	     * The execution time overhead (in instructions)  for the guard_verifier will depend only on the type, and currently we only have one type :-) But again this should be measured.
+	       Again, I assume it is executed the same as nr_bbls_dynamic_size, and for now each has an overhead of 25 instructions. But that is a very wild guess
+	-->
+	     
+	<protectionInstantiation>
+		<protectionInstantiationName>Code Guards Region</protectionInstantiationName>
+		<protectionName>guarded_region</protectionName>
+		<codeRegionAnnotation> label(DANIELE: here comes a label for the region :-)) </codeRegionAnnotation>
+		<clientTimeOverhead>1</clientTimeOverhead>
+ 		<clientMemoryOverhead>1</clientMemoryOverhead>
+		<serverTimeOverhead>1</serverTimeOverhead>
+ 		<serverMemoryOverhead>1</serverMemoryOverhead>
+ 		<networkOverhead>1</networkOverhead>
+	</protectionInstantiation>
+	
+	<protectionInstantiation>
+		<protectionInstantiationName>Code Guards Attestator</protectionInstantiationName>
+		<protectionName>guard_attestator</protectionName>
+		<codeRegionAnnotation> label(DANIELE: here comes a label for the attestator :-)), regions(DANIELE: here comes a label for the region it refers to :-)) </codeRegionAnnotation>
+		<clientTimeOverhead>1 + (25 + 7 * #nr_bbls_static OF THE REFERRED TO REGION# * #nr_bbls_dynamic_size# ) / #nr_ins_dynamic_size#</clientTimeOverhead>
+ 		<clientMemoryOverhead>1</clientMemoryOverhead>
+		<serverTimeOverhead>1</serverTimeOverhead>
+ 		<serverMemoryOverhead>1</serverMemoryOverhead>
+ 		<networkOverhead>1</networkOverhead>
+	</protectionInstantiation>
+
+	<protectionInstantiation>
+		<protectionInstantiationName>Code Guards Verifier</protectionInstantiationName>
+		<protectionName>guard_verifier</protectionName>
+		<codeRegionAnnotation> label(DANIELE: here comes a label for the attestator :-)) </codeRegionAnnotation>
+		<clientTimeOverhead>1 + (25 * #nr_bbls_dynamic_size#) / #nr_ins_dynamic_size#</clientTimeOverhead>
+ 		<clientMemoryOverhead>1</clientMemoryOverhead>
+		<serverTimeOverhead>1</serverTimeOverhead>
+ 		<serverMemoryOverhead>1</serverMemoryOverhead>
+ 		<networkOverhead>1</networkOverhead>
+	</protectionInstantiation>
+	
+
+
+</protectionInstantiationsList>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="rulesLanguage" nsURI="http://www.aspire_fp7.eu/adss/RulesLanguage"
+    nsPrefix="rulesLanguage">
+  <eClassifiers xsi:type="ecore:EClass" name="Model">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="rules" upperBound="-1"
+        eType="#//Rule" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Rule">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="conditions" upperBound="-1"
+        eType="#//Condition" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="action" eType="#//Action"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Condition"/>
+  <eClassifiers xsi:type="ecore:EClass" name="FunctionDeclaration" eSuperTypes="#//Condition">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="parameters" unique="false"
+        upperBound="-1" eType="#//ParameterType"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="ParameterType">
+    <eLiterals name="IGNORE" literal="_"/>
+    <eLiterals name="CRYPTOGRAPHIC_KEY" value="1" literal="cryptographicKey"/>
+    <eLiterals name="INITIALIZATION_VECTOR" value="2" literal="initializationVector"/>
+    <eLiterals name="PLAINTEXT" value="3" literal="plaintext"/>
+    <eLiterals name="CIPHERTEXT" value="4" literal="ciphertext"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="Action">
+    <eLiterals name="DECRYPT_AES128_CBC" literal="decrypt:AES128-CBC"/>
+    <eLiterals name="DECRYPT_AES128_ECB" value="1" literal="decrypt:AES128-ECB"/>
+    <eLiterals name="ENCRYPT_AES128_CBC" value="2" literal="encrypt:AES128-CBC"/>
+    <eLiterals name="ENCRYPT_AES128_ECB" value="3" literal="encrypt:AES128-ECB"/>
+  </eClassifiers>
+</ecore:EPackage>

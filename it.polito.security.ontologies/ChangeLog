@@ -1,0 +1,13 @@
+v0.1.1  Daniele Canavese  <daniele.canavese@polito.it>
+
+	* Some polishing and bug fixes
+
+0.2.0  Daniele Canavese  <daniele.canavese@polito.it>
+
+	* Minor bug-fixes
+	* Added the ability to find an ontology expressivity
+	* Added the support for FaCT++
+	* Added the ability to insert SWRL rules and custom built-ins
+	* Refactored some individual methods as generic methods
+	* Added the support for reading the obvious axioms
+	* Added the support for (de)serialization of Java objects into an ontology

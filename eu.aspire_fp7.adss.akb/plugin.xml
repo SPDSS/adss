@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<!--
+    Copyright (c) 2016 Politecnico di Torino.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+   
+    Contributors:
+        Politecnico di Torino - initial API and implementation
+ -->
+
+<plugin>
+   <extension-point id="ontologies" name="ontologies" schema="schema/ontologies.exsd"/>
+   <extension-point id="prolog" name="prolog" schema="schema/prolog.exsd"/>
+   <extension-point id="protectionInstantiations" name="prolog" schema="schema/protectionInstantiations.exsd"/>
+   <extension-point id="architectures" name="architectures" schema="schema/architectures.exsd"/>
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated akb -->
+      <package
+            uri="eu.aspire_fp7.adss.akb"
+            class="eu.aspire_fp7.adss.akb.AkbPackage"
+            genModel="xcore/akb.xcore"/>
+   </extension>
+   <extension
+         point="eu.aspire_fp7.adss.akb.ontologies">
+      <ontology
+            owlFile="owl/akb.owl">
+      </ontology>
+   </extension>
+   <extension
+         point="eu.aspire_fp7.adss.akb.prolog">
+      <prologFile
+            plFile="pl/baseAttacks.pl">
+      </prologFile>
+      <prologFile
+            plFile="pl/stealAttacks.pl">
+      </prologFile>
+   </extension>
+   <extension
+         point="eu.aspire_fp7.adss.akb.protectionInstantiations">
+      <protectionInstantiationFile
+            xmlFile="protectionInstantiations/antiDebugging.xml">
+      </protectionInstantiationFile>
+      <protectionInstantiationFile
+            xmlFile="protectionInstantiations/binaryCodeControlFlowObfuscation.xml">
+      </protectionInstantiationFile>
+      <protectionInstantiationFile
+            xmlFile="protectionInstantiations/callStackChecks.xml">
+      </protectionInstantiationFile>
+      <protectionInstantiationFile
+            xmlFile="protectionInstantiations/softVM.xml">
+      </protectionInstantiationFile>
+      <protectionInstantiationFile
+            xmlFile="protectionInstantiations/wbc.xml">
+      </protectionInstantiationFile>
+      <protectionInstantiationFile
+            xmlFile="protectionInstantiations/staticRemoteAttestation.xml">
+      </protectionInstantiationFile>
+      <protectionInstantiationFile
+            xmlFile="protectionInstantiations/codeMobility.xml">
+      </protectionInstantiationFile>
+   </extension>
+   <extension
+         point="eu.aspire_fp7.adss.akb.architectures">
+      <architecture
+            name="ARMv7-a"
+            sizeOfDouble="8"
+            sizeOfFloat="4"
+            sizeOfInt="4"
+            sizeOfLongDouble="8"
+            sizeOfLongInt="4"
+            sizeOfLongLongInt="8"
+            sizeOfShortInt="2">
+      </architecture>
+   </extension>
+
+</plugin>

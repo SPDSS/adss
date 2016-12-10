@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (c) 2016 Politecnico di Torino.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+   
+    Contributors:
+        Politecnico di Torino - initial API and implementation
+ -->
+
+<protectionInstantiationsList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://protectionInstantiation.akb.adss.aspire_fp7.eu" xsi:schemaLocation="../schema/protectionInstantiation.xsd">
+	<!--
+	     * The reasoning here is very similar to anti-debugging, a similar amount of unknowns, but the parameters are different (and there is no context switch involved), and there is no initialization
+	       overhead.
+	     * the overhead is an *approximation*, for which I'll be using an additional metric called #nr_bbls_static#, #nr_bbls_dynamic_size# and #nr_bbls_dynamic#. However, these are not yet supported by the metrics
+	       but you can approximate both by nr_ins_static/8 and nr_ins_dynamic/8 etc.
+	     * The model here is approximately correct, but there are various unknown (for known) variables involved. Reasoning:
+	       - Per switch to the SoftVM and back. Initial guess: 1000 instructions
+	         However! Note that there can be multiple switches per regio (for example due to instructions that are not supported by the SoftVM)! There is no good way
+	         to guesstimate this right now :-( So another guesstimate: on average 1 switch per 8 (dynamic) BBLs.
+	       - The annoying part here is that not only do memory instructions have a different overhead compared to other functions, but potentially EACH individual instruction has a different overhead :-(
+	         So right now we'll guess an average overhead per instruction. Initial guesstimate: 250.
+	     * As in CFG Obfuscations, we count the overhead compared to the number of executed instructions
+	     * This leads us to:
+	       switch_cost = 1000
+	       average_instruction_overhead = 250
+	       estimated_nr_switches = 0.125 * #nr_bbls_dynamic_size#
+	       total_additional_instructions = estimated_nr_switches * switch_cost + #nr_bb * memory_access_overhead
+
+	       =>
+
+	       clientTimeOverhead = (#nr_ins_dynamic_size# + total_additional_instructions) / #nr_ins_dynamic_size#
+	                          = 1 + total_additional_instructions / #nr_ins_dynamic_size#
+	                          = 1 + (20000 + 0.25 * #nr_bbls_dynamic_size# * 2000 + 0.25 * #nr_bbls_dynamic_size# * 1000) / #nr_ins_dynamic_size#
+	-->
+	     
+	<protectionInstantiation>
+		<protectionInstantiationName>SoftVM</protectionInstantiationName>
+		<protectionName>softVM</protectionName>
+		<codeRegionAnnotation>softvm, in_softvm</codeRegionAnnotation>
+		<clientTimeOverhead>1 + (20000 + 0.25 * #nr_bbls_dynamic_size# * 2000 + 0.25 * #nr_bbls_dynamic_size# * 1000) / #nr_ins_dynamic_size#</clientTimeOverhead>
+ 		<clientMemoryOverhead>1</clientMemoryOverhead>
+		<serverTimeOverhead>1</serverTimeOverhead>
+ 		<serverMemoryOverhead>1</serverMemoryOverhead>
+ 		<networkOverhead>1</networkOverhead>
+	</protectionInstantiation>
+</protectionInstantiationsList>

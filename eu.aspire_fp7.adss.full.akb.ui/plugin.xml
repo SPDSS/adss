@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<!--
+    Copyright (c) 2016 Politecnico di Torino.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+   
+    Contributors:
+        Politecnico di Torino - initial API and implementation
+ -->
+
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="eu.aspire_fp7.adss.full.akb.ui.editors.AKBEditor"
+            contributorClass="eu.aspire_fp7.adss.full.akb.ui.editors.AKBEditorContributor"
+            filenames="akb-full.owl"
+            icon="icons/akb.png"
+            id="eu.aspire_fp7.adss.full.akb.ui.editors.AKBEditor"
+            name="ADSS Full AKB Editor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <wizard
+            category="eu.aspire_fp7.adss.ui.category"
+            class="eu.aspire_fp7.adss.full.akb.ui.wizards.NewWizard"
+            icon="icons/newProject.png"
+            id="eu.aspire_fp7.adss.full.ui.newWizard"
+            name="ADSS Full Software Protection Project"
+            project="true">
+      </wizard>
+   </extension>
+   <extension
+         id="eu.aspire_fp7.adss.full.akb.ui.nature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="eu.aspire_fp7.adss.full.akb.ui.wizards.Nature">
+         </run>
+      </runtime>
+   </extension>
+   <extension
+         point="org.eclipse.ui.ide.projectNatureImages">
+      <image
+            icon="icons/nature.png"
+            id="eu.aspire_fp7.adss.full.akb.ui.imageNature"
+            natureId="eu.aspire_fp7.adss.full.akb.ui.nature">
+      </image>
+   </extension>
+
+</plugin>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (c) 2016 Politecnico di Torino.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+   
+    Contributors:
+        Politecnico di Torino - initial API and implementation
+ -->
+
+<protectionInstantiationsList xmlns="http://protectionInstantiation.akb.adss.aspire_fp7.eu"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://protectionInstantiation.akb.adss.aspire_fp7.eu ../schema/protectionInstantiation.xsd ">
+	<protectionInstantiation>
+		<protectionInstantiationName>Static Remote Attestation (high frequency)</protectionInstantiationName>
+		<protectionName>staticRemoteAttestation</protectionName>
+		<codeRegionAnnotation>remote_attestation, static_ra_region, attestator(#label#), attest_at_startup(true)</codeRegionAnnotation>
+		<attestatorAnnotation>static_ra(#random(RW_NORMAL, RA_GOLDBACH)#, HF_SHA256 , #random(NI_1, NI_2, NI_3, NI_4)#, NG_1, MA_1, DS_1), label(#label#), frequency(5)</attestatorAnnotation>
+		<toolForDeployment>Diablo</toolForDeployment>
+		<toolForDeployment>ACCL</toolForDeployment>
+		<clientTimeOverhead>1 + halstead_program_size_dynamic_size * 0.0024</clientTimeOverhead> <!-- ratio -->
+		<clientMemoryOverhead>48 + diablo_blocks * 16</clientMemoryOverhead> <!-- byte -->
+		<serverTimeOverhead>0.001 / 5</serverTimeOverhead> <!-- seconds -->
+		<serverMemoryOverhead>serverMemoryOverhead</serverMemoryOverhead> <!-- unknown -->
+		<networkOverhead>110 / 5</networkOverhead> <!-- bytes, theoretically 44 * number of attestators  -->
+	</protectionInstantiation>
+	<protectionInstantiation>
+		<protectionInstantiationName>Static Remote Attestation (medium frequency)</protectionInstantiationName>
+		<protectionName>staticRemoteAttestation</protectionName>
+		<codeRegionAnnotation>remote_attestation, static_ra_region, attestator(#label#), attest_at_startup(true)</codeRegionAnnotation>
+		<attestatorAnnotation>static_ra(#random(RW_NORMAL, RA_GOLDBACH)#, HF_SHA256 , #random(NI_1, NI_2, NI_3, NI_4)#, NG_1, MA_1, DS_1), label(#label#), frequency(30)</attestatorAnnotation>
+		<toolForDeployment>Diablo</toolForDeployment>
+		<toolForDeployment>ACCL</toolForDeployment>
+		<clientTimeOverhead>1 + halstead_program_size_dynamic_size * 0.0024</clientTimeOverhead> <!-- ratio -->
+		<clientMemoryOverhead>48 + diablo_blocks * 16</clientMemoryOverhead> <!-- byte -->
+		<serverTimeOverhead>0.001 / 30</serverTimeOverhead> <!-- seconds -->
+		<serverMemoryOverhead>serverMemoryOverhead</serverMemoryOverhead> <!-- unknown -->
+		<networkOverhead>110 / 30</networkOverhead> <!-- bytes, theoretically 44 * number of attestators  -->
+	</protectionInstantiation>
+	<protectionInstantiation>
+		<protectionInstantiationName>Static Remote Attestation (low frequency)</protectionInstantiationName>
+		<protectionName>staticRemoteAttestation</protectionName>
+		<codeRegionAnnotation>remote_attestation, static_ra_region, attestator(#label#), attest_at_startup(true)</codeRegionAnnotation>
+		<attestatorAnnotation>static_ra(#random(RW_NORMAL, RA_GOLDBACH)#, HF_SHA256 , #random(NI_1, NI_2, NI_3, NI_4)#, NG_1, MA_1, DS_1), label(#label#), frequency(120)</attestatorAnnotation>
+		<toolForDeployment>Diablo</toolForDeployment>
+		<toolForDeployment>ACCL</toolForDeployment>
+		<clientTimeOverhead>1 + halstead_program_size_dynamic_size * 0.0024</clientTimeOverhead> <!-- ratio -->
+		<clientMemoryOverhead>48 + diablo_blocks * 16</clientMemoryOverhead> <!-- byte -->
+		<serverTimeOverhead>0.001 / 120</serverTimeOverhead> <!-- seconds -->
+		<serverMemoryOverhead>serverMemoryOverhead</serverMemoryOverhead> <!-- unknown -->
+		<networkOverhead>110 / 120</networkOverhead> <!-- bytes, theoretically 44 * number of attestators  -->
+	</protectionInstantiation>
+</protectionInstantiationsList>

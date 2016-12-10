@@ -1,0 +1,7 @@
+IMPORTANT!
+==========
+If you regenerate the implementations, you need also to do the following:
++ UseTargetImple.getParameters() : isUnique() returns false
++ FunctionDeclarationImpl.getParameters() : isUnique() returns false
++ FunctionDeclarationImpl.getParameters() : isUnique() returns false
++ SolutionSequenceImpl.getAppliedProtectionInstantiations : isUnique() returns false

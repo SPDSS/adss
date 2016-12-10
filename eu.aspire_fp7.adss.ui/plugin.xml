@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<!--
+    Copyright (c) 2016 Politecnico di Torino.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+   
+    Contributors:
+        Politecnico di Torino - initial API and implementation
+ -->
+
+<plugin>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="eu.aspire_fp7.adss.ui.category"
+            name="ADSS">
+      </category>
+   </extension>
+   <extension
+         point="org.eclipse.ui.services">
+      <serviceFactory
+            factoryClass="eu.aspire_fp7.adss.ui.ADSSServiceFactory">
+         <service
+               serviceClass="eu.aspire_fp7.adss.ui.ADSSService">
+         </service>
+      </serviceFactory>
+   </extension>
+
+</plugin>

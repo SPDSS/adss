@@ -1,0 +1,1500 @@
+package eu.aspire_fp7.adss.akb
+
+import it.polito.security.ontologies.Ontology
+import org.eclipse.emf.common.util.BasicEList
+import java.nio.file.Paths
+import java.util.Stack
+import java.util.HashMap
+import java.util.HashSet
+import eu.aspire_fp7.adss.util.Strings
+import org.eclipse.emf.ecore.util.EcoreUtil
+
+type Ontology wraps Ontology
+type Integer wraps Integer
+type AttackStepTypeWithNull wraps AttackStepType
+type LevelWithNull wraps Level
+
+@GenModel(documentation="The model.")
+class Model
+{
+	@GenModel(documentation="The ontology.")
+	Ontology ontology
+	@GenModel(documentation="The contained application parts.")
+	contains ApplicationPart[] applicationParts
+	@GenModel(documentation="The contained application part sets.")
+	contains ApplicationPartSet[] applicationPartSets
+	@GenModel(documentation="The attack paths.")
+	contains AttackPath[] attackPaths
+	@GenModel(documentation="The attack step types.")
+	contains AttackStepType[] attackStepTypes
+	@GenModel(documentation="The attack steps.")
+	contains AttackStep[] attackSteps
+	@GenModel(documentation="The protections.")
+	contains Protection[] protections
+	@GenModel(documentation="The preferences.")
+	contains Preferences preferences
+	@GenModel(documentation="The rules.")
+	contains Rule[] rules
+	@GenModel(documentation="The protection objectives.")
+	contains ProtectionObjective[] protectionObjectives
+	@GenModel(documentation="The applied protection instantiations.")
+	contains AppliedProtectionInstantiation[] appliedProtectionInstantiations
+	@GenModel(documentation="The available protections.")
+	refers derived Protection[] availableProtections get
+	{
+		var availableProtections = new BasicEList<Protection>
+		for (i : protections)
+			if (i.enabled)
+				availableProtections.add(i)
+		return availableProtections
+	}
+	refers derived Protection[] availableSecondLevelProtections get
+	{
+		var availableSecondLevelProtections = new BasicEList<Protection>
+		for (i : protections)
+			if (i.enabled && i.secondLevel)
+				availableSecondLevelProtections.add(i)
+		return availableSecondLevelProtections
+	}
+	@GenModel(documentation="The assets.")
+	refers derived ApplicationPart[] assets get
+	{
+		var assets = new BasicEList<ApplicationPart>
+		var parts = new Stack<ApplicationPart>
+		parts += applicationParts
+		while (!parts.isEmpty)
+		{
+			var i = parts.pop
+			if (i.asset)
+				assets += i
+			parts += i.applicationParts
+		}
+		return assets
+	}
+	@GenModel(documentation="The attacker.")
+	contains Attacker attacker
+	@GenModel(documentation="The attacker tool types.")
+	contains AttackerToolType[] attackerToolTypes
+	@GenModel(documentation="The available attacker tools.")
+	contains AttackerTool[] attackerTools
+	@GenModel(documentation="The vanilla application solution.")
+	contains Solution vanillaSolution
+	@GenModel(documentation="The solutions.")
+	contains Solution[] Solutions
+	@GenModel(documentation="The tools available to the attacker.")
+	refers derived AttackerTool[] availableTools get
+	{
+		var tools = new BasicEList<AttackerTool>
+		for (i : attackerTools)
+			if (i.enabled)
+				tools.add(i)
+		return tools
+	}
+	@GenModel(documentation="Retrieves the number of application parts.")
+	derived int applicationPartsCount get
+	{
+		return allApplicationParts.size
+	}
+	@GenModel(documentation="Retrieves all the application parts.")
+	refers derived ApplicationPart[] allApplicationParts get
+	{
+		var parts = new BasicEList<ApplicationPart>
+		var aux = new BasicEList<ApplicationPart>
+		aux.addAll(applicationParts)
+		
+		while (!aux.empty)
+		{
+			var p = aux.get(0)
+			aux.remove(0)
+			for (j : p.applicationParts)
+				aux.add(0, j)
+			parts.add(p)
+		}
+		
+		return parts
+	}
+	@GenModel(documentation="Retrieves the number of assets.")
+	derived int assetsCount get
+	{
+		return assets.size
+	}
+	@GenModel(documentation="Retrieves the number of data.")
+	derived int dataCount get
+	{
+		var int c = 0
+		for (i : applicationParts)
+			if (i.datum)
+				c = c + 1
+		return c
+	}
+	@GenModel(documentation="Retrieves the number of codes.")
+	derived int codesCount get
+	{
+		var int c = 0
+		for (i : applicationParts)
+			if (i.code)
+				c = c + 1
+		return c
+	}
+	@GenModel(documentation="Retrieves the number of protections.")
+	derived int protectionsCount get
+	{
+		return protections.size
+	}
+	@GenModel(documentation="Retrieves the number of attacker tools.")
+	derived int attackerToolsCount get
+	{
+		return attackerTools.size
+	}
+	@GenModel(documentation="Retrieves the number of attacker tool types.")
+	derived int attackerToolTypesCount get
+	{
+		return attackerToolTypes.size
+	}
+	@GenModel(documentation="Retrieves the number of available attacker tools.")
+	derived int availableAttackerToolsCount get
+	{
+		return availableTools.size
+	}
+	@GenModel(documentation="Retrieves the number of available protections.")
+	derived int availableProtectionsCount get
+	{
+		return availableProtections.size
+	}
+	@GenModel(documentation="Retrieves the number of attack paths.")
+	derived int attackPathsCount get
+	{
+		return attackPaths.size
+	}
+	@GenModel(documentation="Retrieves the number of attack steps.")
+	derived int attackStepsCount get
+	{
+		return attackSteps.size
+	}
+	@GenModel(documentation="Retrieves the number of attack step types.")
+	derived int attackStepTypesCount get
+	{
+		return attackStepTypes.size
+	}
+	@GenModel(documentation="Retrieves the number of protection objectives.")
+	derived int protectionObjectivesCount get
+	{
+		return protectionObjectives.size
+	}
+	@GenModel(documentation="Retrieves the number of applied protection instantiations.")
+	derived int appliedProtectionInstantiationsCount get
+	{
+		return appliedProtectionInstantiations.size
+	}
+	@GenModel(documentation="Retrieves the number of protection instantiations.")
+	derived int protectionInstantiationsCount get
+	{
+		var int c = 0
+		for (i : protections)
+			c = c + i.instantiations.size
+		return c
+	}
+	@GenModel(documentation="Retrieves the number of solutions.")
+	derived int solutionsCount get
+	{
+		return solutions.size
+	}
+	refers derived AttackPath[] keyAttackPaths get
+	{
+		var attacks = new BasicEList<AttackPath>
+		for (i : attackPaths)
+			if (i.key)
+				attacks.add(i)
+		return attacks
+	}
+}
+
+@GenModel(documentation="An application part.")
+class ApplicationPart
+{
+	@GenModel(documentation="The application part id.")
+	int ^id
+	@GenModel(documentation="The application part name.")
+	String name
+	@GenModel(documentation="The application part sets containing this part.")
+	refers ApplicationPartSet[] sets opposite applicationParts
+	@GenModel(documentation="The application part type.")
+	ApplicationPartType ^type
+	@GenModel(documentation="The parameter index.")
+	int index
+	@GenModel(documentation="The properties.")
+	Property[] properties
+	@GenModel(documentation="The source file in which the application part is located.")
+	String sourceFilePath
+	@GenModel(documentation="The code where the datum is declared, null if the datum is global")
+	refers ApplicationPart declaringCode opposite applicationParts
+	@GenModel(documentation="The source file line where this application part starts.")
+	int startLine
+	@GenModel(documentation="The source file line where this application part starts.")
+	int endLine
+	@GenModel(documentation="The datum size in memory.")
+	int datumSize
+	@GenModel(documentation="Indicates if this part is in a system file or not.")
+	boolean inSystemFile
+	@GenModel(documentation="If the part is global (otherwise is local).")
+	derived boolean global get
+	{
+		return declaringCode == null
+	}
+	@GenModel(documentation="The short location of the application part.")
+	derived String shortLocation get
+	{
+		if (^type == ApplicationPartType.REFERENCE)
+			return ""
+		else if (startLine != endLine)
+			return Paths.get(sourceFilePath).fileName + " : " +  startLine + "-" + endLine
+		else
+			return Paths.get(sourceFilePath).fileName + " : " +  startLine
+	}
+	@GenModel(documentation="The weight, meaningful only for the assets.")
+	double weight
+	@GenModel(documentation="The security properties.")
+	derived Property[] securityProperties get
+	{
+		var securities = new BasicEList<Property>
+		for (i : properties)
+			if (i == Property::CONFIDENTIALITY || i == Property::HARDCONFIDENTIALITY || i == Property::INTEGRITY || i == Property::PRIVACY)
+				securities += i
+		return securities
+	}
+	@GenModel(documentation="The parameters.")
+	refers derived ApplicationPart[] parameters get
+	{
+		var parameters = new BasicEList<ApplicationPart>
+		for (i : applicationParts)
+			if (i.^type == ApplicationPartType::PARAMETER)
+				parameters += i
+		return parameters
+	}
+	@GenModel(documentation="Checks if the application part is an asset.")
+	derived boolean asset get
+	{
+		return !securityProperties.empty
+	}
+	@GenModel(documentation="Checks if the application part contains recursively another application part.")
+	op boolean ^contains(ApplicationPart part)
+	{
+		if (this == part)
+			return true
+		else
+			for (i : applicationParts)
+				if (i.contains(part))
+					return true
+		return false
+	}
+	@GenModel(documentation="The contained application parts.")
+	contains ApplicationPart[] applicationParts opposite declaringCode
+	@GenModel(documentation="The uses.")
+	contains UseTarget[] uses opposite usedBy
+	@GenModel(documentation="The target of the uses.")
+	refers UseTarget[] targetOf opposite target
+	@GenModel(documentation="The body.")
+	contains CodeBlock body
+	@GenModel(documentation="Retrieves the object hash code.")
+	op int hashCode()
+	{
+		var result = 17
+		
+		if (sourceFilePath != null)
+			result = 31 * result + sourceFilePath.hashCode
+		result = 31 * result + name.hashCode
+		result = 31 * result + ^type.toString.hashCode
+		result = 31 * result + startLine.toString.hashCode
+		result = 31 * result + endLine.toString.hashCode
+		
+		return result
+	}
+	@GenModel(documentation="Compares another object with the current one.")
+	op boolean equals(Object object)
+	{
+		if (object == null)
+			return false
+		else if (object instanceof ApplicationPart)
+			return sourceFilePath == object.sourceFilePath && name == object.name && ^type == object.^type && startLine == object.startLine &&
+				endLine == object.endLine
+		else
+			return false
+	}
+	@GenModel(documentation="Translates the object into a string.")
+	op String toString()
+	{
+		return name
+	}
+	@GenModel(documentation="The recursive application part count.")
+	derived int applicationPartsCount get
+	{
+		var count = 1
+		for (i : applicationParts)
+			count = count + i.applicationPartsCount
+		return count
+	}
+	@GenModel(documentation="The assets.")
+	refers derived ApplicationPart[] assets get
+	{
+		var assets = new BasicEList<ApplicationPart>
+		var parts = new Stack<ApplicationPart>
+		parts += applicationParts
+		while (!parts.isEmpty)
+		{
+			var i = parts.pop
+			if (i.asset)
+				assets += i
+			parts += i.applicationParts
+		}
+		return assets
+	}
+	@GenModel(documentation="Checks if the application part is a datum.")
+	op boolean isDatum()
+	{
+		return ^type == ApplicationPartType::CRYPTOGRAPHIC_KEY || ^type == ApplicationPartType::INTEGER_DATUM ||
+			^type == ApplicationPartType::STATIC_INTEGER_ARRAY_DATUM || ^type == ApplicationPartType::INTEGER_ARRAY_DATUM ||
+			^type == ApplicationPartType::GENERIC_VARIABLE || ^type == ApplicationPartType::PARAMETER || ^type == ApplicationPartType::INITIALIZATION_VECTOR ||
+			 ^type == ApplicationPartType::PLAINTEXT || ^type == ApplicationPartType::CIPHERTEXT;
+	}
+	@GenModel(documentation="Checks if the application part is a code region.")
+	op boolean isCode()
+	{
+		return ^type == ApplicationPartType::CODE_REGION || ^type == ApplicationPartType.FUNCTION;
+	}
+	@GenModel(documentation="Checks if the application part contains an asset")
+	op boolean containsAsset()
+	{
+		var aux = new BasicEList<ApplicationPart>
+		aux.addAll(applicationParts)
+		
+		while (!aux.empty)
+		{
+			var p = aux.get(0)
+			if (p.asset)
+				return true
+			aux.remove(0)
+			for (j : p.applicationParts)
+				aux.add(0, j)
+		}
+		
+		return false
+	}
+}
+
+@GenModel(documentation="The use types.")
+enum UseType
+{
+	ACCESSES as "accesses"
+	CALLS as "calls"
+	INITIALIZES as "initializes"
+	DECRYPTS as "decrypts"
+	ENCRYPTS as "encrypts"
+	RECEIVES_AS_CIPHERTEXT as "receivesAsCiphertext"
+	RECEIVES_AS_PLAINTEXT as "receivesAsPlaintext"
+	ENFORCES_EXECUTION_ONCE_AFTER_INSTALL as "enforcesExecutionOnceAfterInstall"
+	ENABLES as "enables"
+}
+
+@GenModel(documentation="A use target.")
+class UseTarget
+{
+	@GenModel(documentation="The target application part.")
+	refers ApplicationPart target opposite targetOf
+	@GenModel(documentation="The application parts using this target.")
+	refers ApplicationPart usedBy opposite uses
+	@GenModel(documentation="The line of code where this uses is located.")
+	int line
+	@GenModel(documentation="The source file in which the uses is located.")
+	String sourceFilePath
+	@GenModel(documentation="The use type.")
+	UseType ^type
+	@GenModel(documentation="The parameter list, if this is a call.")
+	refers ApplicationPart[] parameters
+	@GenModel(documentation="Retrieves the object hash code.")
+	op int hashCode()
+	{
+		var result = 17
+		
+		result = 31 * result + sourceFilePath.hashCode
+		result = 31 * result + line.toString.hashCode
+		result = 31 * result + ^type.toString.hashCode
+		result = 31 * result + target.hashCode
+		result = 31 * result + parameters.hashCode
+		
+		return result
+	}
+	@GenModel(documentation="Compares another object with the current one.")
+	op boolean equals(Object object)
+	{
+		if (object == null)
+			return false
+		else if (object instanceof UseTarget)
+			return sourceFilePath == object.sourceFilePath && line == object.line && ^type == object.^type &&
+				EcoreUtil.equals(target, object.target) && EcoreUtil.equals(parameters, object.parameters)
+		else
+			return false
+	}
+}
+
+@GenModel(documentation="The properties.")
+enum Property
+{
+	PRIVACY as "privacy"
+	INTEGRITY as "integrity"
+	CONFIDENTIALITY as "confidentiality"
+	HARDCONFIDENTIALITY as "hardConfidentiality"
+	HARDCODED as "hardcoded"
+}
+
+@GenModel(documentation="An attack step.")
+class AttackStep
+{
+	@GenModel(documentation="The attack step name.")
+	String name
+	@GenModel(documentation="The attack step type.")
+	AttackStepTypeWithNull ^type
+	@GenModel(documentation="The formula used to evaluate the effort needed by the attacker to complete this attack step.")
+	String formula
+	@GenModel(documentation="The Petri nets transition.")
+	String transition
+	@GenModel(documentation="Retrieves the object hash code.")
+	op int hashCode()
+	{
+		var result = 17
+		
+		result = 31 * result + name.hashCode
+		
+		return result
+	}
+	@GenModel(documentation="Compares another object with the current one.")
+	op boolean equals(Object object)
+	{
+		if (object == null)
+			return false
+		else if (object instanceof AttackStep)
+			return name == object.name
+		else
+			return false
+	}
+	@GenModel(documentation="Translates the object into a string.")
+	op String toString()
+	{
+		return name
+	}
+}
+
+@GenModel(documentation="An attack step type.")
+class AttackStepType
+{
+	@GenModel(documentation="The attack step type name.")
+	String name
+	@GenModel(documentation="The attack step regex.")
+	String regex
+	@GenModel(documentation="The tools needed to do the attack step.")
+	refers AttackerToolType[] attackerTools
+	@GenModel(documentation="Retrieves the object hash code.")
+	op int hashCode()
+	{
+		var result = 17
+		
+		result = 31 * result + name.hashCode
+		
+		return result
+	}
+	@GenModel(documentation="Compares another object with the current one.")
+	op boolean equals(Object object)
+	{
+		if (object == null)
+			return false
+		else if (object instanceof AttackStepType)
+			return name == object.name
+		else
+			return false
+	}
+	@GenModel(documentation="Translates the object into a string.")
+	op String toString()
+	{
+		return name
+	}
+}
+
+@GenModel(documentation="An attack path.")
+class AttackPath
+{
+	@GenModel(documentation="The attack steps.")
+	refers AttackStep[] attackSteps
+	@GenModel(documentation="The protection objectives.")
+	refers ProtectionObjective[] protectionObjectives
+	@GenModel(documentation="The attacker tool types.")
+	refers AttackerToolType[] attackerToolTypes
+	@GenModel(documentation="The cost.")
+	double cost
+	@GenModel(documentation="The applied protection instantiations.")
+	refers AppliedProtectionInstantiation[] appliedProtectionInstantiations
+	@GenModel(documentation="Indicates if this attack path is a key attack or not.")
+	boolean key
+	@GenModel(documentation="Retrieves the object hash code.")
+	op int hashCode()
+	{
+		var result = 17
+		
+		result = 31 * result + attackSteps.hashCode
+		
+		return result
+	}
+	@GenModel(documentation="Compares another object with the current one.")
+	op boolean equals(Object object)
+	{
+		if (object == null)
+			return false
+		else if (object instanceof AttackPath)
+			return EcoreUtil.equals(attackSteps, object.attackSteps)
+		else
+			return false
+	}
+	@GenModel(documentation="Translates the object into a string.")
+	op String toString()
+	{
+		return "attack path " + hashCode
+	}
+	@GenModel(documentation="The object id.")
+	derived long ^id get
+	{
+		return hashCode as long + -(Integer.MIN_VALUE as long)
+	}
+	@GenModel(documentation="The mitigations.")
+	derived String mitigations get
+	{
+		var map = new HashMap<AppliedProtectionInstantiation, Level>
+		for (i : appliedProtectionInstantiations)
+			for (j : i.attackMitigations)
+				if (j.attackPaths.contains(this))
+					if (!map.containsKey(i))
+						map.put(i, j.level)
+					else if (map.get(i) == Level.LOW)
+						map.put(i, j.level)
+					else if (map.get(i) == Level.MEDIUM && j.level == Level.HIGH)
+						map.put(i, j.level)
+		 
+		var values = new HashSet<String>
+		
+		for (i : map.entrySet)
+			values.add (i.key + " (" + i.value + ")")
+
+		return Strings.join(values, "\n")
+	}
+	@GenModel(documentation="The mitigation level.")
+	derived Level level get
+	{
+		var Level level = Level.NONE
+		
+		for (i : appliedProtectionInstantiations)
+			for (j : i.attackMitigations)
+				if (j.attackPaths.contains(this))
+					if (level == Level.NONE || level == Level.LOW)
+						level = j.level
+					else if (level == Level.MEDIUM && j.level == Level.HIGH)
+						level = j.level
+			
+		return level
+	}
+}
+
+@GenModel(documentation="A protection mitigation.")
+class AttackMitigation
+{
+	@GenModel(documentation="The mitigation name.")
+	String name
+	@GenModel(documentation="The mitigation level.")
+	Level level
+	@GenModel(documentation="The attack type.")
+	refers AttackStepType ^type
+	@GenModel(documentation="The attack paths.")
+	refers AttackPath[] attackPaths
+	@GenModel(documentation="The protection.")
+	refers Protection protection opposite mitigations
+	@GenModel(documentation="Retrieves the object hash code.")
+	op int hashCode()
+	{
+		var result = 17
+		
+		result = 31 * result + name.hashCode
+		
+		return result
+	}
+	@GenModel(documentation="Compares another object with the current one.")
+	op boolean equals(Object object)
+	{
+		if (object == null)
+			return false
+		else if (object instanceof AttackMitigation)
+			return name == object.name
+		else
+			return false
+	}
+}
+
+@GenModel(documentation="A software protection.")
+class Protection
+{
+	@GenModel(documentation="The protection id.")
+	String ^id
+	@GenModel(documentation="The protection name.")
+	String name
+	@GenModel(documentation="The enabled state of the protection.")
+	boolean enabled
+	@GenModel(documentation="The automatically deployable state of the protection.")
+	boolean automaticallyDeployable
+	@GenModel(documentation="True if the protection is a suitable for second level protection")
+	boolean secondLevel
+	@GenModel(documentation="How much is useful in the second level protection decision process to enlarge the areas of code on which the protection is applied.")
+	Level secondLevelEnlargmentUsefulness
+	@GenModel(documentation="How much is useful in the second level protection decision process to apply the protection to callers and callees of the function to which the protection is applied.")
+	Level secondLevelCallGraphEnlargmentUsefulness
+	@GenModel(documentation="How much is useful in the second level protection decision process to repeat a protection on other functions.")
+	Level secondLevelRepetitionUsefulness
+	@GenModel(documentation="The suggested protection instantiations to repeat the protection in the second level protection decision process.")
+	contains ProtectionInstantiation[] secondLevelRepetitionInstantiation
+	@GenModel(documentation="The types of application parts which the protection can be applied.")
+	ApplicationPartType[] applicationPartTypes
+	@GenModel(documentation="The mitigations.")
+	contains AttackMitigation[] mitigations opposite protection
+	@GenModel(documentation="The security requirements enforced by this protection.")
+	Property[] enforcedSecurityRequirements
+	@GenModel(documentation="The protections that cannot precede this one.")
+	refers Protection[] forbiddenPrecedences
+	@GenModel(documentation="The protections that should not precede this one.")
+	refers Protection[] discouragedPrecedences
+	@GenModel(documentation="The protections that should precede this one.")
+	refers Protection[] encouragedPrecedences
+	@GenModel(documentation="The protections that precede this one in the ACTC work-flow.")
+	refers Protection[] actcPrecedences
+	@GenModel(documentation="The singleton boolean.")
+	boolean singleton
+	@GenModel(documentation="The types of attacker tools that can defeat completely the protection.")
+	refers AttackerToolType[] defeatedAttackerToolTypes
+	@GenModel(documentation="The types of attacker tools blocked by the protection.")
+	refers AttackerToolType[] blockedAttackerToolTypes
+	@GenModel(documentation="The protection instantiations.")
+	contains ProtectionInstantiation[] instantiations opposite protection
+	@GenModel(documentation="The action types.")
+	ActionType[] actions
+	@GenModel(documentation="The flags.")
+	ProtectionFlag[] flags
+	@GenModel(documentation="Retrieves the object hash code.")
+	op int hashCode()
+	{
+		var result = 17
+		
+		result = 31 * result + name.hashCode
+		
+		return result
+	}
+	@GenModel(documentation="Compares another object with the current one.")
+	op boolean equals(Object object)
+	{
+		if (object == null)
+			return false
+		else if (object instanceof Protection)
+			return name == object.name
+		else
+			return false
+	}
+	@GenModel(documentation="Translates the object into a string.")
+	op String toString()
+	{
+		return name
+	}
+	@GenModel(documentation="The number of protection instantiations.")
+	derived int instantiationsCount get
+	{
+		return instantiations.size
+	}
+}
+
+@GenModel(documentation="The protection flags.")
+enum ProtectionFlag
+{
+	WHOLE_FUNCTION as "wholeFunction"
+	ONE_PER_FUNCTION as "onePerFunction"
+}
+
+@GenModel(documentation="The application part types.")
+enum ApplicationPartType
+{
+	CODE_REGION as "codeRegion"
+	FUNCTION as "function"
+	CRYPTOGRAPHIC_KEY as "cryptographicKey"
+	INITIALIZATION_VECTOR as "initializationVector"
+	PLAINTEXT as "plaintext"
+	CIPHERTEXT as "ciphertext"
+	GENERIC_VARIABLE as "genericVariable"
+	INTEGER_DATUM as "integerDatum"
+	INTEGER_ARRAY_DATUM as "integerArrayDatum"
+	STATIC_INTEGER_ARRAY_DATUM as "staticIntegerArrayDatum"
+	PARAMETER as "parameter"
+	REFERENCE as "reference"
+	IGNORE as "ignore"
+}
+
+@GenModel(documentation="The levels.")
+enum Level
+{
+	HIGH as "high"
+	MEDIUM as "medium"
+	LOW as "low"
+	NONE as "none"
+}
+
+@GenModel(documentation="A protection instantiation.")
+class ProtectionInstantiation
+{
+	@GenModel(documentation="The protection instantiation name.")
+	String name
+	@GenModel(documentation="The protection.")
+	container Protection protection opposite instantiations
+	@GenModel(documentation="The variable annotation.")
+	String variableAnnotation
+	@GenModel(documentation="The code annotation.")
+	String codeAnnotation
+	@GenModel(documentation="The verifier annotation.")
+	String verifierAnnotation
+	@GenModel(documentation="The attestator annotation.")
+	String attestatorAnnotation
+	@GenModel(documentation="The client time overhead.")
+	String clientTimeOverhead
+	@GenModel(documentation="The server time overhead.")
+	String serverTimeOverhead
+	@GenModel(documentation="The client memory overhead.")
+	String clientMemoryOverhead
+	@GenModel(documentation="The server memory overhead.")
+	String serverMemoryOverhead
+	@GenModel(documentation="The network overhead.")
+	String networkOverhead
+	@GenModel(documentation="Retrieves the object hash code.")
+	op int hashCode()
+	{
+		var result = 17
+		
+		result = 31 * result + name.hashCode
+		
+		return result
+	}
+	@GenModel(documentation="Compares another object with the current one.")
+	op boolean equals(Object object)
+	{
+		if (object == null)
+			return false
+		else if (object instanceof ProtectionInstantiation)
+			return name == object.name
+		else
+			return false
+	}
+	@GenModel(documentation="Translates the object into a string.")
+	op String toString()
+	{
+		return name
+	}
+}
+
+@GenModel(documentation="The attacker.")
+class Attacker
+{
+	@GenModel(documentation="The expertise.")
+	ExpertiseLevel expertise
+	@GenModel(documentation="The attacker budget limit or a negative value if unlimited.")
+	Integer budgetLimit
+	@GenModel(documentation="Retrieves the object hash code.")
+	op int hashCode()
+	{
+		var result = 17
+		
+		result = 31 * result + "attacker".hashCode // This is a singleton.
+		
+		return result
+	}
+	@GenModel(documentation="Compares another object with the current one.")
+	op boolean equals(Object object)
+	{
+		if (object == null)
+			return false
+		else if (object instanceof Attacker)
+			return expertise == object.expertise && budgetLimit == object.budgetLimit
+		else
+			return false
+	}
+}
+
+@GenModel(documentation="The expertise levels.")
+enum ExpertiseLevel
+{
+	AMATEUR as "amateur"
+	GEEK as "geek"
+	EXPERT as "expert"
+	GURU as "guru"
+}
+
+@GenModel(documentation="An attacker tool.")
+class AttackerTool
+{
+	@GenModel(documentation="The name.")
+	String name
+	@GenModel(documentation="The types.")
+	refers AttackerToolType[] types
+	@GenModel(documentation="The minimum expertise required.")
+	ExpertiseLevel expertise
+	@GenModel(documentation="The monetary cost.")
+	int cost
+	@GenModel(documentation="The enabled state of the tool.")
+	derived boolean enabled get
+	{
+		var attacker = (eContainer as Model).attacker
+
+		if (attacker.budgetLimit != null && cost > attacker.budgetLimit)
+			return false
+		if (attacker.expertise == ExpertiseLevel::AMATEUR && expertise != ExpertiseLevel::AMATEUR)
+			return false
+		if (attacker.expertise == ExpertiseLevel::GEEK && expertise != ExpertiseLevel::AMATEUR &&
+			expertise != ExpertiseLevel::GEEK)
+			return false
+		if (attacker.expertise == ExpertiseLevel::EXPERT && expertise != ExpertiseLevel::AMATEUR &&
+			expertise != ExpertiseLevel::GEEK && expertise != ExpertiseLevel::EXPERT)
+			return false
+
+		return true
+	}
+	@GenModel(documentation="Retrieves the object hash code.")
+	op int hashCode()
+	{
+		var result = 17
+		
+		result = 31 * result + name.hashCode
+		
+		return result
+	}
+	@GenModel(documentation="Compares another object with the current one.")
+	op boolean equals(Object object)
+	{
+		if (object == null)
+			return false
+		else if (object instanceof AttackerTool)
+			return name == object.name
+		else
+			return false
+	}
+}
+
+@GenModel(documentation="The attacker tool types.")
+class AttackerToolType
+{
+	@GenModel(documentation="The name.")
+	String name
+	@GenModel(documentation="Retrieves the object hash code.")
+	op int hashCode()
+	{
+		var result = 17
+		
+		result = 31 * result + name.hashCode
+		
+		return result
+	}
+	@GenModel(documentation="Compares another object with the current one.")
+	op boolean equals(Object object)
+	{
+		if (object == null)
+			return false
+		else if (object instanceof AttackerToolType)
+			return name == object.name
+		else
+			return false
+	}
+	@GenModel(documentation="Translates the object into a string.")
+	op String toString()
+	{
+		return name
+	}
+}
+
+@GenModel(documentation="The user preferences.")
+class Preferences
+{
+	// General ADSS preferences.
+	@GenModel(documentation="The working directory.")
+	String workingDirectory = "/home/aspire/test"
+	@GenModel(documentation="The ACTC configuration file.")
+	String actcConfigurationFile = "test.json"
+	@GenModel(documentation="The ADSS patch file.")
+	String adssPatchFile = "adss.patch"
+	@GenModel(documentation="The ADSS json file.")
+	String adssJSONFile = "adss.json"
+	@GenModel(documentation="The architecture where the project is deployed.")
+	String architecture = ""
+	// Remote connection preferences.
+	@GenModel(documentation="The use of a remote connection.")
+	boolean remoteConnection = "true"
+	@GenModel(documentation="The username for the remote server.")
+	String remoteUsername = "aspire"
+	@GenModel(documentation="The password for the remote server.")
+	String remotePassword = "aspire"
+	@GenModel(documentation="The remote host to use.")
+	String remoteHost = "127.0.1.1"
+	@GenModel(documentation="The remote port to use.")
+	int remotePort = "3022"
+	@GenModel(documentation="The remote server file separator.")
+	String remoteFileSeparator = "/"
+	// Commands preferences.
+	@GenModel(documentation="The ACTC command.")
+	String commandACTC = "/opt/ACTC/actc.py"
+	@GenModel(documentation="The Perl interpreter.")
+	String commandPerl = "/usr/bin/perl"
+	@GenModel(documentation="The dot command.")
+	String commandDot = "/usr/bin/dot"
+	// Metrics preferences.
+	@GenModel(documentation="The metrics coefficients file name or null to disable it.")
+	String metricsFile = "gammas.db"
+	// Parser preferences.
+	@GenModel(documentation="Parses the header files.")
+	boolean parserHeaderParsing = "false"
+	@GenModel(documentation="Ignores the system files.")
+	boolean parserSystemFilesIgnoration = "true"
+	// Attack finder preferences.
+	@GenModel(documentation="The attack finder time limit in seconds or a non-positive value to disable it.")
+	int attacksTimeLimit = "60"
+	@GenModel(documentation="The attack finder maximum search depth.")
+	int attacksMaximumDepth = "4"
+	@GenModel(documentation="Removes the included protection objectives.")
+	boolean attacksIncludedProtectionObjectivesRemoval = "true"
+	// Protection finder preferences.
+	@GenModel(documentation="The minimum allowed mitigation level for a protection to be used.")
+	Level protectionsMinimumAttackMitigation = "medium"
+	// Common L1P and L2P preferences.
+	@GenModel(documentation="The client time overhead in percentage w.r.t. to the vanilla application.")
+	double clientTimeOverhead = "10"
+	@GenModel(documentation="The server time overhead in percentage w.r.t. to the vanilla application.")
+	double serverTimeOverhead = "10"
+	@GenModel(documentation="The client memory overhead in bytes w.r.t. to the vanilla application.")
+	int clientMemoryOverhead = "1024"
+	@GenModel(documentation="The server memory overhead in bytes w.r.t. to the vanilla application.")
+	int serverMemoryOverhead = "1024"
+	@GenModel(documentation="The network overhead in bytes per second w.r.t. to the vanilla application.")
+	int networkOverhead = "1024"
+	// L1P preferences: general stuff.
+	@GenModel(documentation="The number of solutions to find.")
+	int l1pSolutionsCount = "10"
+	@GenModel(documentation="Performs an additional Petri Nets pass on the found solutions.")
+	boolean l1pPetriNetsPass = "false"
+	// L1P preferences: termination.
+	@GenModel(documentation="The tim limit in seconds or a non-positive value to disable it.")
+	int l1pTimeLimit = "60"
+	@GenModel(documentation="The maximum number of solutions to explore or a non-positive value to disable it.")
+	int l1pSolutionsLimit= "-10000"
+	@GenModel(documentation="The gap limit or a non-positive value to disable it.")
+	double l1pGapLimit= "-10.0"
+	// L1P preferences: constraints.
+	@GenModel(documentation="The percentage of the client time overhead to use or a non-positive value to ignore the overhead.")
+	double l1pClientTimeOverheadPercentage = "50"
+	@GenModel(documentation="The percentage of the server time overhead to use or a non-positive value to ignore the overhead.")
+	double l1pServerTimeOverheadPercentage = "50"
+	@GenModel(documentation="The percentage of the client memory overhead to use or a non-positive value to ignore the overhead.")
+	double l1pClientMemoryOverheadPercentage = "50"
+	@GenModel(documentation="The percentage of the server memory overhead to use or a non-positive value to ignore the overhead.")
+	double l1pServerMemoryOverheadPercentage = "50"
+	@GenModel(documentation="The percentage of the network overhead to use or a non-positive value to ignore the overhead.")
+	double l1pNetworkOverheadPercentage = "50"
+	@GenModel(documentation="Ignores the discouraged precedences.")
+	boolean l1pDiscouragedPrecedencesIgnoration = "true"
+	@GenModel(documentation="Focuses only on the encouraged precedences.")
+	boolean l1pEncouragedPrecedencesFocusing = "true"
+	@GenModel(documentation="Uses the ACTC precedences.")
+	boolean l1pUseACTCPrecedences = "true"
+	@GenModel(documentation="Ignores the application part order.")
+	boolean l1pIgnoreApplicationPartOrder = "true"
+	@GenModel(documentation="The maximum number o1 instantiations per protection objective or <code>null</code> for infinity.")
+	int l1pMaximumInstantiationsPerProtectionObjective = "3"
+	@GenModel(documentation="The main search maximum depth.")
+	int l1pMainSearchMaximumDepth = "3"
+	// L1P preferences: algorithm.
+	@GenModel(documentation="Uses a minimax tree for each code correlation set.")
+	boolean l1pMultiTree = "true"
+	@GenModel(documentation="The initial alpha value or <code>NaN</code> for infinity.")
+	double l1pInitialAlpha = "0"
+	@GenModel(documentation="The initial beta value or <code>NaN</code> for infinity.")
+	double l1pInitialBeta = "5"
+	@GenModel(documentation="The research base delta.")
+	double l1pResearchDelta = "1.0"
+	@GenModel(documentation="The transposition table maximum size or a non-positive value to disable them.")
+	int l1pTranspositionTableMaximumSize = "1000000"
+	// L2P preferences: general stuff.
+	@GenModel(documentation="The number of the best first level solution on which the second level solution is inferred with the automatic build")
+	int l2pSolutionsCount = "1"
+	@GenModel(documentation="The seed to generate random function splitting, <=0 for casual seed")
+	int l2pFunctionSplittingSeed = "1106103861"
+	// L2P preferences: termination.
+	@GenModel(documentation="The maximum number of solutions of the second level solution MIP model to be found, <=0 for no solution limit")
+	int l2pSolutionLimit = "0" 
+	@GenModel(documentation="The time limit to solve the second level solution MIP model, <=0 for no time limit")
+	int l2pTimeLimit = "60"
+	@GenModel(documentation="The gap (relative distance between the actual solution and the possible best solution) limit to solve the second level solution MIP model, <=0 for no gap limit")
+	double l2pGapLimit = "0"
+	// L2P preferences: constraints.
+	@GenModel(documentation="The maximum number of time a non singleton protection instantiation can be applied to an application part")
+	int l2pUpperBound = "2"
+	@GenModel(documentation="The minimum length that a code block must have in order to be further splitted, <= 0 in order to generate an application part for every code block.")
+	int l2pFunctionSplittingMediumCodeBlockLength = "2" 
+	@GenModel(documentation="If a value > 0 is passed, the length of the generated blocks will be random between (minimumCodeBlockLength-+inf(minimumCodeBlockLength/codeBlockLengthRandomizationDenominator)), otherwise all the generated blocks will be long at most minimumCodeBlockLength lines; in any case the last block generated may be less long than the specified interval.")
+	int l2pFunctionSplittingCodeBlockLengthRandomizationDenominator = "2"
+	@GenModel(documentation="The desired function splitting depth level, <=0 for no limit on depth level.")
+	int l2pFunctionSplittingDepthLevel = "0"
+	// Petri nets preferences.
+	@GenModel(documentation="The Petri nets directory.")
+	String setPNDirectory
+	@GenModel(documentation="The Petri nets file.")
+	String setPNFile
+	@GenModel(documentation="Retrieves the object hash code.")
+	op int hashCode()
+	{
+		var result = 17
+		
+		result = 31 * result + "preferences".hashCode // This is a singleton
+		
+		return result
+	}
+	@GenModel(documentation="Compares another object with the current one.")
+	op boolean equals(Object object)
+	{
+		if (object == null)
+			return false
+		else if (object instanceof Preferences)
+			return this === object // This is a singleton
+		else
+			return false
+	}
+}
+
+@GenModel(documentation="An applied protection instantiation.")
+class AppliedProtectionInstantiation
+{
+	@GenModel(documentation="The protection instantiation.")
+	refers ProtectionInstantiation protectionInstantiation
+	@GenModel(documentation="The application part.")
+	refers ApplicationPart applicationPart
+	@GenModel(documentation="The protection objectives.")
+	refers ProtectionObjective[] protectionObjectives
+	@GenModel(documentation="The attack mitigations.")
+	refers AttackMitigation[] attackMitigations
+	@GenModel(documentation="If this applied protection instantiation is part of a second level solution, why has been decided to apply it.")
+	refers SecondLevelMotivation[] secondLevelMotivation
+	@GenModel(documentation="Translates the object into a string.")
+	op String toString()
+	{
+		var locations = new HashSet<ApplicationPart>
+		locations.add(applicationPart)
+		for (i : applicationPart.sets)
+			if (protectionInstantiation.protection.actions.contains(i.action))
+				locations.addAll(i.applicationParts);
+		
+		if (secondLevelMotivation.size == 0)
+			return protectionInstantiation + " @ " + Strings.join(locations, ", ")
+		else 
+			return protectionInstantiation + " @ " + Strings.join(locations, ", ") + " [" + secondLevelMotivation.get(0).motivationType + "]"
+	}
+	@GenModel(documentation="Retrieves the object hash code.")
+	op int hashCode()
+	{
+		var result = 17
+		
+		result = 31 * result + protectionInstantiation.hashCode
+		result = 31 * result + applicationPart.hashCode
+		
+		return result
+	}
+	@GenModel(documentation="Compares another object with the current one.")
+	op boolean equals(Object object)
+	{
+		if (object == null)
+			return false
+		else if (object instanceof AppliedProtectionInstantiation)
+			return EcoreUtil.equals(protectionInstantiation, object.protectionInstantiation) &&
+				EcoreUtil.equals(applicationPart, object.applicationPart)
+		else
+			return false
+	}
+}
+
+@GenModel(documentation="A second level motivation.")
+class SecondLevelMotivation
+{
+	@GenModel(documentation="The second level motivation.")
+	SecondLevelMotivationType motivationType
+	@GenModel(documentation="The first level applied protection instantiations to which the motivation refers.")
+	refers AppliedProtectionInstantiation firstLevelAppliedProtectionInstantiations
+	@GenModel(documentation="Translates the object into a string.")
+	op String toString()
+	{
+		if (firstLevelAppliedProtectionInstantiations != null)
+			return motivationType.toString + " " + firstLevelAppliedProtectionInstantiations.toString
+		else
+			return motivationType.toString
+	}
+	@GenModel(documentation="Retrieves the object hash code.")
+	op int hashCode()
+	{
+		var result = 17
+		
+		result = 31 * result + motivationType.hashCode
+		if (firstLevelAppliedProtectionInstantiations != null)
+			result = 31 * result + firstLevelAppliedProtectionInstantiations.hashCode
+		
+		return result
+	}
+	@GenModel(documentation="Compares another object with the current one.")
+	op boolean equals(Object object)
+	{
+		if (object == null)
+			return false
+		else if (object instanceof SecondLevelMotivation)
+			return motivationType == object.motivationType &&
+				EcoreUtil.equals(firstLevelAppliedProtectionInstantiations, object.firstLevelAppliedProtectionInstantiations)
+		else
+			return false
+	}
+}
+
+@GenModel(documentation="The second level motivation types.") 
+enum SecondLevelMotivationType
+{
+	KEPT as "kept"
+	ENLARGED as "enlarged"
+	CALL_GRAPH_ENLARGED as "callGraphEnlarged"
+	REPEATED as "repeated"
+}
+
+@GenModel(documentation="A solution sequence.")
+class SolutionSequence
+{
+	@GenModel(documentation="The applied instantiations.")
+	refers AppliedProtectionInstantiation[] appliedProtectionInstantiations
+	@GenModel(documentation="Translates the object into a string.")
+	op String toString()
+	{
+		return appliedProtectionInstantiations.toString
+	}
+	@GenModel(documentation="Retrieves the object hash code.")
+	op int hashCode()
+	{
+		var result = 17
+		
+		result = 31 * result + appliedProtectionInstantiations.hashCode
+		
+		return result
+	}
+	@GenModel(documentation="Compares another object with the current one.")
+	op boolean equals(Object object)
+	{
+		if (object == null)
+			return false
+		else if (object instanceof SolutionSequence)
+			return EcoreUtil.equals(appliedProtectionInstantiations, object.appliedProtectionInstantiations)
+		else
+			return false
+	}
+}
+
+@GenModel(documentation="A solution.")
+class Solution
+{
+	@GenModel(documentation="The solution sequences.")
+	refers SolutionSequence[] solutionSequences
+	@GenModel(documentation="The application metrics.")
+	refers Metric[] applicationMetrics
+	@GenModel(documentation="The application part metrics.")
+	refers ApplicationPartMetricSet[] applicationPartMetricSets
+	@GenModel(documentation="If this solution is a second level one, the first level solution on which this is built.")
+	refers Solution firstLevelSolution
+	@GenModel(documentation="The score.")
+	double score
+	@GenModel(documentation="Translates the object into a string.")
+	op String toString()
+	{
+		return solutionSequences.toString
+	}
+	@GenModel(documentation="The object id.")
+	derived String ^id get
+	{
+		var h = hashCode as long + -(Integer.MIN_VALUE as long)
+		
+		if (firstLevelSolution == null)
+			return h.toString
+		else
+			return h.toString + " (" + firstLevelSolution.^id.toString + ")"
+	}
+	@GenModel(documentation="Retrieves the object hash code.")
+	op int hashCode()
+	{
+		var result = 17
+		
+		var r = 0
+		for (i : solutionSequences)
+			r += i.hashCode
+		result = 31 * result + r
+		
+		return result
+	}
+	@GenModel(documentation="Compares another object with the current one.")
+	op boolean equals(Object object)
+	{
+		if (object == null)
+			return false
+		else if (object instanceof Solution)
+			return EcoreUtil.equals(solutionSequences, object.solutionSequences)
+		else
+			return false
+	}
+}
+
+@GenModel(documentation="A list of metrics for an application part.")
+class ApplicationPartMetricSet
+{
+	@GenModel(documentation="The application part.")
+	refers ApplicationPart applicationPart
+	@GenModel(documentation="The metrics.")
+	refers Metric[] metrics
+	@GenModel(documentation="Retrieves the object hash code.")
+	op int hashCode()
+	{
+		var result = 17
+		
+		result = 31 * result + applicationPart.hashCode
+		var r = 0
+		for (i : metrics)
+			r += i.hashCode
+		result = 31 * result + r
+		
+		return result
+	}
+	@GenModel(documentation="Compares another object with the current one.")
+	op boolean equals(Object object)
+	{
+		if (object == null)
+			return false
+		else if (object instanceof ApplicationPartMetricSet)
+			return EcoreUtil.equals(applicationPart, object.applicationPart) && EcoreUtil.equals(metrics, object.metrics)
+		else
+			return false
+	}
+}
+
+@GenModel(documentation="A metric.")
+class Metric
+{
+	@GenModel(documentation="The metric name.")
+	String name
+	@GenModel(documentation="The metric value.")
+	Double value
+	@GenModel(documentation="Retrieves the object hash code.")
+	op int hashCode()
+	{
+		var result = 17
+		
+		result = 31 * result + name.hashCode
+		result = 31 * result + value.hashCode
+		
+		return result
+	}
+	@GenModel(documentation="Compares another object with the current one.")
+	op boolean equals(Object object)
+	{
+		if (object == null)
+			return false
+		else if (object instanceof Metric)
+			return name == object.name && value == object.value
+		else
+			return false
+	}
+}
+
+@GenModel(documentation="A code block.")
+class CodeBlock
+{
+	@GenModel(documentation="The block type.")
+	CodeBlockType ^type
+	@GenModel(documentation="The contained blocks.")
+	contains CodeBlock[] codeBlocks
+	@GenModel(documentation="The source file line where this block starts.")
+	int startLine
+	@GenModel(documentation="The source file line where this block starts.")
+	int endLine
+	@GenModel(documentation="The source file in which the uses is located.")
+	String sourceFilePath
+	@GenModel(documentation="Retrieves the object hash code.")
+	op int hashCode()
+	{
+		var result = 17
+		
+		result = 31 * result + ^type.toString.hashCode
+		result = 31 * result + sourceFilePath.hashCode
+		result = 31 * result + startLine.toString.hashCode
+		result = 31 * result + endLine.toString.hashCode
+		
+		return result
+	}
+	@GenModel(documentation="Compares another object with the current one.")
+	op boolean equals(Object object)
+	{
+		if (object == null)
+			return false
+		else if (object instanceof CodeBlock)
+			return ^type == object.^type && sourceFilePath == object.sourceFilePath && startLine == object.startLine &&
+				endLine == object.endLine
+		else
+			return false
+	}
+}
+
+@GenModel(documentation="The code block types.")
+enum CodeBlockType
+{
+	FOR as "for"
+	WHILE as "while"
+	DO_WHILE as "doWhile"
+	IF as "if"
+	SWITCH as "switch"
+	OTHER as "other"
+}
+
+@GenModel(documentation="A rule.")
+class Rule
+{
+	@GenModel(documentation="The action.")
+	ActionType action
+	@GenModel(documentation="The function declarations.")
+	refers FunctionDeclaration[] functionDeclarations
+	@GenModel(documentation="Retrieves the object hash code.")
+	op int hashCode()
+	{
+		var result = 17
+		
+		result = 31 * result + action.toString.hashCode
+		var r = 0
+		for (i : functionDeclarations)
+			r += i.hashCode
+		result = 31 * result + r
+		
+		return result
+	}
+	@GenModel(documentation="Compares another object with the current one.")
+	op boolean equals(Object object)
+	{
+		if (object == null)
+			return false
+		else if (object instanceof Rule)
+			return action == object.action && EcoreUtil.equals(functionDeclarations, object.functionDeclarations)
+		else
+			return false
+	}
+}
+
+@GenModel(documentation="The action types.")
+enum ActionType
+{
+	DECRYPT_AES128_CBC as "decryptAES128-CBC"
+	DECRYPT_AES128_ECB as "decryptAES128-ECB"
+	ENCRYPT_AES128_CBC as "encryptAES128-CBC"
+	ENCRYPT_AES128_ECB as "encryptAES128-ECB"
+}
+
+@GenModel(documentation="A function declaration.")
+class FunctionDeclaration
+{
+	@GenModel(documentation="The function name.")
+	String name
+	@GenModel(documentation="The function parameters.")
+	ApplicationPartType[] parameters
+	@GenModel(documentation="Retrieves the object hash code.")
+	op int hashCode()
+	{
+		var result = 17
+		
+		result = 31 * result + name.hashCode
+		for (i : parameters)
+			result = 31 * result + i.toString.hashCode
+		
+		return result
+	}
+	@GenModel(documentation="Compares another object with the current one.")
+	op boolean equals(Object object)
+	{
+		if (object == null)
+			return false
+		else if (object instanceof FunctionDeclaration)
+			return name == object.name && parameters == object.parameters
+		else
+			return false
+	}
+}
+
+@GenModel(documentation="An application part set.")
+class ApplicationPartSet
+{
+	@GenModel(documentation="The application parts.")
+	refers ApplicationPart[] applicationParts opposite sets
+	@GenModel(documentation="The action.")
+	ActionType action
+	@GenModel(documentation="Retrieves the object hash code.")
+	op int hashCode()
+	{
+		var result = 17
+		
+		result = 31 * result + action.toString.hashCode
+		var r = 0
+		for (i : applicationParts)
+			r += i.hashCode
+		result = 31 * result + r
+		
+		return result
+	}
+	@GenModel(documentation="Compares another object with the current one.")
+	op boolean equals(Object object)
+	{
+		if (object == null)
+			return false
+		else if (object instanceof ApplicationPartSet)
+			return action == object.action && EcoreUtil.equals(applicationParts, object.applicationParts)
+		else
+			return false
+	}
+}
+
+@GenModel(documentation="A protection objective.")
+class ProtectionObjective
+{
+	@GenModel(documentation="The application parts.")
+	refers ApplicationPart applicationPart
+	@GenModel(documentation="The property.")
+	Property property
+	@GenModel(documentation="Retrieves the object hash code.")
+	op int hashCode()
+	{
+		var result = 17
+		
+		result = 31 * result + applicationPart.hashCode
+		result = 31 * result + property.toString.hashCode
+		
+		return result
+	}
+	@GenModel(documentation="Compares another object with the current one.")
+	op boolean equals(Object object)
+	{
+		if (object == null)
+			return false
+		else if (object instanceof ProtectionObjective)
+			return EcoreUtil.equals(applicationPart, object.applicationPart) && property == object.property
+		else
+			return false
+	}
+	@GenModel(documentation="Translates the object into a string.")
+	op String toString()
+	{
+		return applicationPart + "/" + property
+	}
+}

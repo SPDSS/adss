@@ -1,0 +1,134 @@
+\documentclass{memoir}
+
+\usepackage[usenames, dvipsnames, svgnames, table]{xcolor}
+\usepackage{tikz}
+\usepackage[backgroundcolor = SkyBlue!25, bordercolor = SkyBlue, linecolor = SkyBlue, textsize = small]{todonotes}
+\usepackage[colorlinks = true, urlcolor = RoyalBlue, citecolor = OrangeRed, linkcolor = RoyalBlue, hyperfootnotes = true]{hyperref}
+\usepackage[margin = 25mm]{geometry}
+\usepackage[scaled = 0.85]{DejaVuSansMono}
+
+\pretitle{\centering\Huge\bfseries}
+\posttitle{\par\vskip1em\begin{center}\normalfont\Large\textsc{ASPIRE Decision Support System}\vskip2em\includegraphics[width = 0.25\linewidth]{images/adss.png}\end{center}}
+\preauthor{\vfill\scshape\centering}
+\postauthor{\begin{center}\includegraphics[width = 0.25\linewidth]{images/polito.png}\end{center}}
+\predate{\vfill\normalfont\centering}
+\postdate{\vskip2em\begin{center}\includegraphics[width= 0.15\linewidth]{images/aspire.png}\end{center}\newpage}
+
+\renewcommand\colorchapnum{\bfseries\hspace*{-2mm}}
+\renewcommand\colorchaptitle{\normalfont\scshape}
+\chapterstyle{pedersen}
+
+\newcommand{\UI}[1]{\texttt{#1}}
+\newcommand{\ScreenShot}[1]
+{
+	\begin{center}
+		\includegraphics[scale = 0.35]{#1}
+	\end{center}
+}
+
+\setlength{\marginparwidth}{20mm}
+
+\title{ADSS -- User Manual}
+\author{Politecnico di Torino}
+
+\begin{document}
+	\maketitle
+	\tableofcontents*
+
+	\newpage
+	\vspace*{0em}
+	\vfill
+	\begin{center}
+		\textsc{\Large{Disclaimer}}
+		\vskip1em
+		\fbox{\parbox{0.75\linewidth}{This manual documents the ASPIRE Decision Support System as released in date \today{} and its content it is likely to change as new versions are released.}}
+	\end{center}
+	\vfill
+
+	\chapter{Installing the ADSS}
+	
+	The simplest way to start using the ADSS is to mount and run the ASPIRE virtual image, however the ADSS can also be installed on another machine.
+	
+	Before actually installing it, the host system that must met some prerequisites.
+	
+	The ADSS requires the following components to be correctly installed:
+	
+	\begin{itemize}
+		\item Java Runtime Environment 7.x or superior;
+		\item SWI-Prolog 7.x or superior (\url{http://www.swi-prolog.org});
+		\item CodeSurfer 2.x or superior (with a proper builder license);
+		\item the ASPIRE Annotation Extractor;
+		\item the ACTC;
+		\item at least one ASPIRE software protection tool.
+	\end{itemize}
+	
+	Under a Debian/Ubuntu you can easily install the JRE and SWI-Prolog via the following command lines:
+	
+	\begin{quote}
+		\texttt{aptitude install openjdk-7-jre openjdk-7-jre-headless}\\
+		\texttt{aptitude install swi-prolog swi-prolog-java swi-prolog-nox}
+	\end{quote}
+	
+	The other components installations requires however some manual effort.
+	
+	Once your system has been prepared, you can start the actual ADSS installation in two different ways:
+	
+	\begin{itemize}
+		\item copy the ADSS RCP package anywhere and decompress it;
+		\item download any flavor of Eclipse 3.7 Indigo you like from \url{http://www.eclipse.org/indigo/} and use the update site \todo{Fix it}\url{something} to install the ADSS plug-ins into your IDE.
+	\end{itemize}
+	
+	\chapter{Overview}
+	
+	The ADSS main task is to automatically (or semi-automatically with some hints from the user) protect a software application.
+	
+	This job is performed by following a sequence of phases that are:
+	
+	\begin{enumerate}
+		\item \emph{initialization} (automatic): the AKB is loaded, any previously saved results are restored and all the ADSS internal components are prepared;
+		\item \emph{application setup} (manual): the user provides the source files that must be protected. They must be adequately annotated\todo{Noy yet available};
+		\item \emph{code parsing} (semi-automatic): the source files are parsed (using the CodeSurfer and Annotation Extractor tools) and their structure is inferred. The user can eventually fine tune the acquired data\todo{Noy yet available};
+		\item \emph{attacks deduction} (automatic): all the attacks that can threaten the application are inferred;
+		\item \emph{protection deduction} (semi-automatic): the protection techniques that can be used to block the attacks are inferred. The user can choose to override some decisions, if needed;
+		\item \emph{golden solution search} (automatic): the golden (best) solution that can be used to protect the application is found. This is the most time-consuming phase;
+		\item \emph{golden solution deployment} (automatic): the golden solution is effectively applied to the application source code files (via the ACTC)\todo{Noy yet available}.
+	\end{enumerate}
+	
+	The user can choose to stop anywhere in between the aforementioned steps, save the results (in the AKB) and resume later.
+	
+	\chapter{Tutorial: getting started}
+	
+	In this chapter, a tutorial describing how to protect a software application using a mostly automatic approach via the ADSS is presented. A more advanced approach is described in Chapter~\ref{ch:advancedUse}.
+
+	Note that the ADSS is a project-based tool, that is for each application to protect the user must create a new project.
+	
+	\begin{center}
+		\fbox{\textsc{Note}: for the time being, the ADSS contains only an hard-coded application (an OTP generator).}
+	\end{center}
+	
+	To start the protection process, perform the following steps:
+	 
+	 \begin{enumerate}
+	 	\item launch your Eclipse IDE with the ADSS plug-ins installed;
+	 	\item create a new ADSS project by choosing \UI{File > New > Project...}. In the \UI{New Project} wizard choose \UI{ADSS > Software Protection Project} and click on \UI{Next >};
+		 	\ScreenShot{images/newProjectWizard.png}
+	 	\item in the \UI{New Software Protection Project} wizard choose a project name, a location directory (if different from the default one) and click on \UI{Finish}. If you leave empty the name field, the ADSS will generate a random UUID for you;
+		 	\ScreenShot{images/newSWProtectionProjectWizard.png}
+	 	\item the AKB editor should appear, opened on the \UI{Overview} page;
+		 	\ScreenShot{images/akbEditor.png}
+	 	\item (optional) click on the \UI{Applications} page to modify the assets and their properties. You can click on the \UI{Properties} and \UI{Weight} cells to change the application parts security requirements and weight;
+		 	\ScreenShot{images/applicationsPage.png}
+	 	\item return to the \UI{Overview} page, if needed, click on \UI{Build All} and wait until the ADSS finishes its job;
+	 	\item in the \UI{Attacks} page you will find all the discovered attack paths and steps;
+		 	\ScreenShot{images/attacksPage.png}
+		\item in the \UI{Protections} page you will find all suitable protections found to block the attacks;
+			 \ScreenShot{images/protectionsPage.png}
+		\item in the \UI{Solutions} page you will find the best solutions that the ADSS found to protect the application, including the golden one (the first one in the list);
+			\ScreenShot{images/solutionsPage.png}
+	 \end{enumerate}
+		
+	\chapter{Tutorial: advanced use of the ADSS}\label{ch:advancedUse}
+
+	\todo[inline]{I'll do it! One day\dots}
+	
+\end{document}

@@ -1,0 +1,36 @@
+STATIC CODE REGION METRICS
+==========================
+nr_ins_static								number of assembler instructions
+nr_src_oper_static							total number of source operands
+nr_dst_oper_static							total number of destination operands
+halstead_program_size_static				(Halstead’s) static program size - number of instructions + number of operators
+nr_edges_static								total number of edges in the static control flow graph
+nr_indirect_edges_CFIM_static				control flow indirection metric - number of CFG edges that become indirect or computed return in the protected program
+cyclomatic_complexity_static				McCabe’s cyclomatic complexity - number of linearly independent paths in the CFG
+
+DYNAMIC CODE REGION METRICS
+===========================
+nr_ins_dynamic_size							number of assembler instructions executed
+nr_src_oper_dynamic_size					total number of source operands consumed during execution
+nr_dst_oper_dynamic_size					total number of destination operands consumed during execution
+halstead_program_size_dynamic_size			dynamic program length - number of executed instructions + number of used operators
+nr_edges_dynamic_size						total number of control flow transfers that are executed
+nr_indirect_edges_CFIM_dynamic_size			total number of times indirect control flows transfers are executed
+nr_ins_dynamic_coverage						amount of different instructions that are executed
+nr_src_oper_dynamic_coverage				number of source operands consumed by the different instructions that are executed
+nr_dst_oper_dynamic_coverage				number of destination operands produced by the different instructions that are executed
+halstead_program_size_dynamic_coverage		(Halstead’s) dynamic program size - number of executed instructions + number of used operators
+nr_edges_dynamic_coverage					total number of separate control flow transfers that are executed
+nr_indirect_edges_CFIM_dynamic_coverage		total number of separate indirect control flows transfers that are executed
+cyclomatic_complexity_dynamic_coverage		McCabe’s cyclomatic complexity - number of linearly independent executed paths in the CFG
+
+CODE MOBILITY METRICS
+=====================
+nr_of_mobile_blocks							number of mobile blocks
+nr_of_mobile_bytes							the total size of the mobile blocks
+
+REMOTE ATTESTATION METRICS
+==========================
+nr_of_bytes_in_ads							the number of bytes stored in the ADS
+nr_of_blocks								the number of blocks
+nr_of_guarded_bytes							the number of bytes to be guarded/attestated

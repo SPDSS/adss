@@ -1,0 +1,27 @@
+/**
+@page howToAddStuff How to add stuff
+
+Adding new rules to the ADSS is primarily done via extension points.
+
+@section howToAddStuffOntologies Adding new sub-ontologies
+
+Procedure:
+-# Create a new plug-in or open an existing one.
+-# Create a new ontology. Its IRI can be anything except `http://www.aspire-fp7.eu/akb`.
+-# Register the ontology using the `eu.aspire_fp7.adss.akb.ontologies` extension.
+
+@note The new ontology will be merged with the other ones _only_ during the initial creation of the AKB. Already
+existing projects will be unaffected.
+
+@section howToAddStuffAttackSteps Adding new attack step and fact rules
+
+Procedure:
+-# Create a new plug-in or open an existing one.
+-# Create a new Prolog file. It must define _only_ `attackStep` and `fact` clauses and you cannot use any file related
+command.
+-# Register the Prolog file using the `eu.aspire_fp7.adss.akb.prolog` extension.
+
+@note The Prolog files are loaded in their order of appearance, so if a file needs something declared in another file
+listed before it is fine.
+
+**/

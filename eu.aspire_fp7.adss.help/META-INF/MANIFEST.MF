@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: ADSS Help
+Bundle-SymbolicName: eu.aspire_fp7.adss.help
+Bundle-Version: 0.0.1.qualifier
+Bundle-Vendor: Politecnico di Torino
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8

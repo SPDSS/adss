@@ -1,0 +1,147 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Name:        (export-functions-on-file)
+;; Args:        filename : STRING
+;; Returns:     UNDEFINED
+;; Example:     (export-functions-on-file "/path/to/location/file.c")
+;; Action:
+;;      Writes functions on file. Filename is created from file.c. ".functions" is used 
+;;		as suffix for the filename
+;; Errors:      
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define (export-functions-on-file filename)
+    	(with-output-to-file (create-filename "adss" ".funcvar") (lambda () (show-callers)))
+)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Name:        (create-filename)
+;; Args:        prefix: STRING
+;;				file: STRING
+;; Returns:     UNDEFINED
+;; Example:     (create-filename "/path/to/location/file.c" ".functions")
+;; Action:
+;;      Creates filename to write current analysis
+;; Errors:      
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define (create-filename filename suffix)
+    (string-append (list->string (manipulate-filename (reverse (string->list filename)))) suffix)
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Name:        (manipulate-filename)
+;; Args:        str-list: list of characters
+;; Returns:     STRING
+;; Example:     (manipulate-filename <list-of-char>)
+;; Action:
+;;     Modifies the list str-list of characters, which represents the current filename, 
+;;	   by substituting characters to make filename more suitable for printing
+;;
+;; Errors:      
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define (manipulate-filename str-list)
+  (let change-chars 
+    (
+      (charset str-list)
+      (new-charset '())
+    )
+    (cond
+      ((equal? charset '())
+        (reverse new-charset))
+      ((equal? (car charset) #\_)
+        (change-chars
+          (cdr charset)
+          (append new-charset (list #\_))
+          ))
+      ((equal? (car charset) #\/)
+        (change-chars
+          '()
+          new-charset
+          ))
+      (else
+        (change-chars
+          (cdr charset)
+          (append new-charset (list (char-downcase (car charset))))
+          ))
+    )
+  )
+  )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Name:        (show-callers)
+;; Args:        None
+;; Returns:     UNDEFINED
+;; Action:  
+;;      Go through the PDGs in the system and for each one print out
+;;      its callers and callees.
+;; Errors:
+;;      None
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(define (show-callers)
+  (for-each 
+   (lambda (pdg)
+     (format #t "Procedure ~a ~a\n" (pdg-procedure-name pdg) (abs-loc-static-function? (pdg-abs-loc pdg)))
+     (unless
+      (eqv? (pdg-kind pdg) 'undefined)
+      ;; Find the callers of this procedure by going through the
+      ;; interprocedural predecessors of the entry point.
+      ;; Put the names of the callers in a hash table
+      ;; to eliminate duplicates.
+      (let ((callers (make-hash-table string=?)))
+        (pdg-edge-set-traverse
+         (pdg-vertex-inter-sources (pdg-entry-vertex pdg))
+         (lambda (v k)
+           (hash-table-put! 
+            callers 
+            (number->string(pdg-procedure-id (pdg-vertex-pdg v)))
+            #t)))
+        (let ((clist (hash-table->list callers)))
+          (if (not (null? clist))
+              (begin
+                (format #t "  Callers:\n")
+                (for-each
+                 (lambda (item)
+                  (format #t "      ~a ~a\n" (pdg-procedure-name(sdg-retrieve-pdg (string->number (car item)))) (pdg-compilation-unit(sdg-retrieve-pdg (string->number (car item)))) )
+                 )
+                clist)
+              )
+          )
+        )
+      )
+      
+      ;; Now find the callees by going through the call sites
+      ;; of the PDG
+      (if (not (null? (pdg-call-sites pdg)))
+	    (begin
+	      (format #t "  Callees:\n")
+		  (for-each
+		     (lambda (pdgc)
+		       ;; Note: pdgc is only a genuine call if the procedure
+		       ;; being called is defined.  If it is NOT defined, then
+		       ;; the procedure is given a unique integer identifier.
+		       (let ((callee (pdg-vertex-callee pdgc)))
+		         (if (and (pdg? callee) (not(equal? (pdg-vertex-file-line pdgc) #f)))
+		             (format #t "      ~a ~a ~a\n" (pdg-procedure-name(sdg-retrieve-pdg(pdg-procedure-id callee)))
+		             				   (pdg-compilation-unit(sdg-retrieve-pdg(pdg-procedure-id callee)))
+		             				   (cdr(pdg-vertex-file-line pdgc))
+			     )
+		             (format #f "Undefined procedure ~a" (pdgc:trans-undefined pdgc) )
+		         )
+		       )
+		     )(pdg-call-sites pdg)
+		  )
+	    )
+	  )
+      
+     )
+   )(sdg-pdgs)
+  )
+)
+
+;; main call to function export-functions-on-file
+;; argument is extracted from global variable userargv
+(export-functions-on-file (car *userargv*))
+
+(quit)

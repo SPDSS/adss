@@ -1,0 +1,333 @@
+// ACTC 2.4.1
+//
+// Note:
+// - "excluded": true/false [false]
+//   if true, step is excluded from toolchain --> no output folder is created
+//   use this field to start toolchain from any step
+//
+// - "traverse": true/false [false]
+//   if true, input files are copied to output folder without any change
+//
+{
+
+  // Target platforms:
+  // - linux [default]
+  // - android
+  "platform" :                "android",
+
+  // Tools
+  "tools": {
+    // libraries
+    "third_party":            "/opt/3rd_party",
+    // src2src
+    "annotation_reader":      ["perl",
+                                "/opt/wbc/annotation_reader.prl"],
+    "config":                 "/opt/wbc/config.x",
+    "wbta":                   ["python",
+                                "/opt/wbc/wbta/Wbta.py"],
+    "convert_pragmas":        ["python",
+                                "/opt/wbc/convert_pragmas.py"],
+    "wbc":                    "/opt/wbc/wbc.x",
+    "read_annot":             "/opt/annotation_extractor/readAnnot.sh",
+    "data_obfuscate":         "/opt/data_obfuscator/scripts/data_obfuscate.sh",
+    "client_server_splitter": "/opt/client_server_splitter",
+    "csurf":                  "/opt/codesurfer/csurf/bin/csurf",
+    "codeguard":              "/opt/codeguard/codeguard.py",
+    "anti_cloning":           "/opt/anti_cloning/annotation/replace.sh",
+    "attestator_selector":    "/opt/RA/attestator_selector.sh",
+    // src2bin
+    "frontend":               "/opt/diablo-android-gcc-toolchain/bin/arm-linux-androideabi-gcc",
+    // bin2bin
+    "extractor":              "/opt/diablo/bin/diablo-extractor",
+    "xtranslator":            "/opt/xtranslator/xtranslator",
+    "code_mobility":          "/opt/code_mobility",
+    "accl":                   "/opt/ACCL",
+    "ascl":                   "/opt/ASCL",
+    "anti_debugging":         "/opt/anti_debugging",
+    "obfuscator":             "/opt/diablo/bin/diablo-obfuscator",
+    "obfuscator_sp":          "/opt/diablo/bin/diablo-selfprofiling"
+  },
+
+  // Source-level Tool chain
+  "src2src": {
+    "excluded": false,
+
+    // Source code annotation
+    "SLP01": {
+      "excluded": false,
+      "source"  : ["fibonacci.c",
+                   "main.c"]
+    },
+
+    // white-box crypto
+    "SLP03": {
+      "excluded": false,
+      "traverse": true,
+ 
+      // WBC annotation extraction tool
+      "_01": {
+        "excluded": false
+      },
+ 
+      // White-Box Tool python
+      "_02": {
+        "excluded": false
+      },
+
+      // WBC header inclusion
+      "_03": {
+        "excluded": false
+      },
+
+      // preprocessor
+      "_04": {
+        "excluded": false
+      },
+
+      // WBC source rewriting tool
+      "_05": {
+        "excluded": false,
+        "options":  ["-size 2000MB"]
+      }
+    },
+
+    // preprocessor
+    "SLP02": {
+      "excluded": false
+    },
+
+    // data hiding
+    "SLP05": {
+      "excluded": false,
+      "traverse": true,
+
+      // source code analysis
+      "_01": {
+        "excluded": false,
+        "options" : []
+      },
+
+      // data obfuscation
+      "_02": {
+        "excluded": false,
+        "options" : []
+      }
+    },
+
+    // client server clode splitting
+    "SLP06": {
+      "excluded": false,
+      "traverse": true,
+    
+      // Process
+      "_01": {
+        "excluded": false,
+        "options" : []
+      },
+    
+      // CSurf
+      "_02": {
+        "excluded": false
+      },
+    
+      // Code transformation
+      "_03": {
+        "excluded": false
+      }
+    },
+    
+    // annotation extraction + external annotation file(s)
+    "SLP04": {
+      "excluded": false,
+      "options" : [],
+      "external": []
+    },
+
+    // code guard
+    "SLP08": {
+      "excluded": false,
+      "traverse": false,
+      "options" : []
+    },
+
+    // anti-cloning
+    "SLP09": {
+      "excluded": false,
+      "traverse": false,
+      "options" : []
+    },
+
+    // remote attestation
+    "SLP07": {
+      "excluded": false,
+      "options" : []
+    }
+  },
+
+  // Assembler, Compiler, Linker
+  "src2bin": {
+  "excluded": false,
+    // Common options for all tools
+    "options"      : [],
+
+    "PREPROCESS": {
+      // -I <dir>
+      // -isystem <dir>
+      // -include <file>
+      // -D<macro[=defn]>
+      "options"    : [""]
+    },
+
+    // .c, .cpp
+    "COMPILE": {
+      "options"    : ["-g"],
+      "options_c"  : [],
+      "options_cpp": []
+    },
+
+    // accl.c
+    "COMPILE_ACCL": {
+      "protocol": "",
+      "endpoint": "",
+      "port"    : ""
+    },
+
+    // Linker
+    "LINK": {
+      "options"    : ["-Os",
+                      "-Wl,--fix-cortex-a8",
+                      "-Wl,--hash-style=sysv",
+                      "-Wl,--no-demangle",
+                      "-Wl,--no-merge-exidx-entries",
+                      "-Wl,-fuse-ld=bfd",
+                      "-Wno-system-headers",
+                      "-Wunknown-pragmas",
+                      "-fno-stack-protector",
+                      "-fno-strict-aliasing",
+                      "-fomit-frame-pointer",
+                      "-fvisibility=hidden",
+                      "-llog",
+                      "-marm",
+                      "-msoft-float",
+                      "-save-temps"],
+      // basename of linked file
+      //   if empty, default value computed from options:
+      //   "liba.so" if "-shared" else "a.out"
+      "binary"     : "test"
+    }
+  },
+
+  // Binary Rewriting Tool Chain
+  "bin2bin": {
+    "excluded": false,
+
+    // vanilla self-profiling
+    "BLP00": {
+      "excluded": true,
+    
+
+      // generate vanilla self-profiling binary
+      "_01": {
+        "excluded": false,
+        "options" : [],
+        "android_obj" : "/opt/diablo/obj/printarm_android.o",
+        "linux_obj" : "/opt/diablo/obj/printarm_linux.o"
+      },
+    
+      // collect execution profile on target board
+      "_02": {
+        "excluded": false,
+        "script" : ""
+      },
+    
+      // recompile using execution profile and calculate dynamic metrics
+      "_03": {
+        "excluded": false,
+        "options" : []
+      }
+    },
+    
+    // Native Code Extraction
+    "BLP01": {
+      "excluded": false,
+      "traverse": false,
+      "options" : []
+    },
+
+    // Bytecode Generation
+    "BLP02": {
+      "excluded": false,
+      "options" : []
+    },
+
+    // Code Integration
+    "BLP03": {
+      "excluded": false,
+      "options" : []
+    },
+
+    // Binary Code Control Flow Obfuscation
+    "BLP04": {
+      "excluded": false,
+      "options" : ["-D",
+                   "-v"]
+    },
+
+    // diablo-obfuscator using runtime profiles
+    "BLP04_DYN": {
+      "excluded": true,
+
+      // obfuscate using runtime profile and calculate dynamic metrics
+      "_01": {
+        "excluded": false,
+        "options" : ""
+      },
+    
+      // Collect dynamic metrics on target board (TODO)
+      "_02": {
+        "excluded": true,
+        "options" : "",
+        "script" : ""
+      }
+    }
+  },
+    
+  // Server side management
+  "SERVER": {
+    "excluded"   : true,
+    "ip_address" : "",
+
+    // Code Splitting
+    "P10": {
+      "script": ""},
+
+    // Code Mobility
+    "P20": {
+      "script": ""},
+
+    // Remote Attestation
+    "P80": {
+      "script": ""}
+  },
+
+  // Metric collection
+  "METRICS": {
+    "excluded" : false,
+    "files"    : {
+        "BC02_SP"          : ["*.stat_complexity_info"],
+        "BC02_SP/profiles" : ["*.plaintext"],
+        "BC02_DYN"         : ["*.dynamic_complexity_info"],
+        "BC05"             : ["*.stat_complexity_info",
+                           "*.stat_regions_complexity_info"],
+        "BC05_DYN"         : ["*.dynamic_complexity_info"]
+    }
+  },
+
+  // Post-processing
+  "POST": {
+    // Short description in ACTC trace
+    "brief": "",
+    // Command line arguments
+    "args" : ""
+  }
+}

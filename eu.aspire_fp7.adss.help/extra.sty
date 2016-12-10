@@ -1,0 +1,69 @@
+\usepackage{amsmath}
+\usepackage{amsfonts}
+
+\DeclareMathOperator{\UserOption}{\mathbb{U}}
+
+\newcommand{\State}[1]{S_{#1}}
+
+\newcommand{\Protection}[1]{p_{#1}}
+\newcommand{\ProtectionsOfState}[1]{P(\State{#1})}
+
+\newcommand{\AttackPath}[1]{A_{#1}}
+\newcommand{\BlockedAttackPathsOfState}[1]{A_\textsc{Blocked}(\State{#1})}
+\newcommand{\UnblockedAttackPathsOfState}[1]{A_\textsc{Unblocked}(\State{#1})}
+
+\newcommand{\AttackStep}[1]{a_{#1}}
+
+\newcommand{\StartingPlayer}{\UserOption_p}
+
+\newcommand{\CombinationCount}{\UserOption_c}
+
+\DeclareMathOperator{\Evaluate}{\mathcal{E}}
+\newcommand{\EvaluateState}[1]{\Evaluate(\State{#1})}
+\newcommand{\EvaluateMax}[1]{\Evaluate_\textsc{Max}(\State{#1})}
+\newcommand{\EvaluateMin}[1]{\Evaluate_\textsc{Min}(\State{#1})}
+\newcommand{\EvaluateLeaf}[1]{\Evaluate_\textsc{Leaf}(\State{#1})}
+\newcommand{\EvaluateTerminal}[1]{\Evaluate_\textsc{Terminal}(\State{#1})}
+\newcommand{\EvaluateTerminalAttacker}{\UserOption_{t, a}}
+\newcommand{\EvaluateTerminalDefender}{\UserOption_{t, d}}
+\newcommand{\EvaluateAttacks}[1]{\Evaluate_\textsc{Attacks}(\State{#1})}
+\newcommand{\EvaluateProtections}[1]{\Evaluate_\textsc{Protections}(\State{#1})}
+
+\DeclareMathOperator{\Mitigation}{\mathcal{M}}
+\newcommand{\MitigationOfAttackStep}[2]{\Mitigation(\AttackStep{#1}, \Protection{#2})}
+\newcommand{\MitigationHigh}{\UserOption_{\Mitigation, h}}
+\newcommand{\MitigationMedium}{\UserOption_{\Mitigation, m}}
+\newcommand{\MitigationLow}{\UserOption_{\Mitigation, l}}
+
+\DeclareMathOperator{\Criticality}{\mathcal{C}}
+\newcommand{\CriticalityOfAttackPath}[1]{\Criticality(\AttackPath{#1}.asset, \AttackPath{#1}.property)}
+\newcommand{\CriticalityHigh}{\UserOption_{\Criticality, h}}
+\newcommand{\CriticalityMedium}{\UserOption_{\Criticality, m}}
+\newcommand{\CriticalityLow}{\UserOption_{\Criticality, l}}
+
+\DeclareMathOperator{\Strength}{\mathcal{S}}
+\newcommand{\StrengthOfProtection}[1]{\Strength(\Protection{#1})}
+\newcommand{\StrengthOfProtections}[2]{\Strength(\Protection{#1}, \Protection{#2})}
+\newcommand{\StrengthHigh}{\UserOption_{\Strength, h}}
+\newcommand{\StrengthMedium}{\UserOption_{\Strength, m}}
+\newcommand{\StrengthLow}{\UserOption_{\Strength, l}}
+\newcommand{\StrengthsHigh}{\UserOption_{\Strength', h}}
+\newcommand{\StrengthsMedium}{\UserOption_{\Strength', m}}
+\newcommand{\StrengthsLow}{\UserOption_{\Strength', l}}
+
+\DeclareMathOperator{\Children}{Children}
+\newcommand{\ChildrenOfState}[1]{\Children(\State{#1})}
+
+\DeclareMathOperator{\Probability}{\pi}
+\newcommand{\ProbabilityOfAttackPath}[1]{\Probability(\AttackPath{#1})}
+\newcommand{\ProbabilityOfAttackStep}[1]{\Probability(\AttackStep{#1})}
+\newcommand{\ProbabilityHigh}{\UserOption_{\Probability, h}}
+\newcommand{\ProbabilityMedium}{\UserOption_{\Probability, m}}
+\newcommand{\ProbabilityLow}{\UserOption_{\Probability, l}}
+\newcommand{\ProbabilityUnknown}{\UserOption_{\Probability, u}}
+
+\newcommand{\AttackerExpertise}{\UserOption_x}
+
+\newcommand{\MaxDepth}{\UserOption_d}
+
+\newcommand{\FullPruning}{\UserOption_p}

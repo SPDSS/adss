@@ -1,0 +1,11 @@
+package it.polito.security.ontologies.samples
+
+class Class1
+{
+	String something
+	refers Class2[] classes
+}
+
+class Class2
+{
+}

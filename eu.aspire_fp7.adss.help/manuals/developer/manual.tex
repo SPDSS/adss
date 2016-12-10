@@ -1,0 +1,212 @@
+\documentclass{memoir}
+
+\usepackage[usenames, dvipsnames, svgnames, table]{xcolor}
+\usepackage{tikz}
+\usepackage[backgroundcolor = SkyBlue!25, bordercolor = SkyBlue, linecolor = SkyBlue, textsize = small]{todonotes}
+\usepackage[colorlinks = true, urlcolor = RoyalBlue, citecolor = OrangeRed, linkcolor = RoyalBlue, hyperfootnotes = true]{hyperref}
+\usepackage[margin = 25mm]{geometry}
+\usepackage[scaled = 0.85]{DejaVuSansMono}
+\usepackage{enumitem}
+
+\pretitle{\centering\Huge\bfseries}
+\posttitle{\par\vskip1em\begin{center}\normalfont\Large\textsc{ASPIRE Decision Support System}\vskip2em\includegraphics[width = 0.25\linewidth]{images/adss.png}\end{center}}
+\preauthor{\vfill\scshape\centering}
+\postauthor{\begin{center}\includegraphics[width = 0.25\linewidth]{images/polito.png}\end{center}}
+\predate{\vfill\normalfont\centering}
+\postdate{\vskip2em\begin{center}\includegraphics[width= 0.15\linewidth]{images/aspire.png}\end{center}\newpage}
+
+\renewcommand\colorchapnum{\bfseries\hspace*{-2mm}}
+\renewcommand\colorchaptitle{\normalfont\scshape}
+\chapterstyle{pedersen}
+
+\setlength{\marginparwidth}{20mm}
+
+\newcommand{\PlugIn}[1]{\texttt{#1}}
+\newcommand{\Method}[1]{\texttt{#1}}
+\newcommand{\Class}[1]{\texttt{#1}}
+\newcommand{\File}[1]{\texttt{#1}}
+\newcommand{\Object}[1]{\texttt{#1}}
+
+\title{ADSS -- Developer Manual}
+\author{Politecnico di Torino}
+
+\begin{document}
+	\maketitle
+	\tableofcontents*
+
+	\newpage
+	\vspace*{0em}
+	\vfill
+	\begin{center}
+		\textsc{\Large{Disclaimer}}
+		\vskip1em
+		\fbox{\parbox{0.75\linewidth}{This manual documents the ASPIRE Decision Support System as released in date \today{} and its content it is likely to change as new versions are released.}}
+	\end{center}
+	\vfill
+
+	\chapter{Preparing the development environment}
+	
+	The ADSS requires some preparations before a developer can start modifying it. It is mainly written in Java (or analogous technologies), so that it should be OS-independent.
+	
+	To setup a fully working development environment you need to follow the following initial steps:
+	
+	\begin{enumerate}
+		\item install the following software into your system:
+			\begin{itemize}
+				\item JDK 7.x or superior (\url{http://www.oracle.com/technetwork/java/javase/downloads/});
+				\item SWI-Prolog 7.2.x or superior (\url{http://www.swi-prolog.org});
+			\end{itemize}
+		\item install the following software in the ASPIRE virtual machine (or in your system if you want to do a local build):
+			\begin{itemize}
+				\item CodeSurfer 2.x or superior (with a proper builder license);
+				\item the ASPIRE Annotation Extractor;
+				\item the ACTC;
+				\item at least one ASPIRE software protection tool.
+			\end{itemize}
+	\end{enumerate}
+	
+	After that you have two choices. The simplest one is to download an already packaged Eclipse, so that:
+	
+	\begin{itemize}
+		\item if you are using Windows:
+		\begin{enumerate}
+			\item download the all-in-one Eclipse binaries from \url{x} and decompress it somewhere;
+			\item download the ADSS workspace from \url{y} and decompress it somewhere else;
+			\item launch Eclipse and when asked for the workspace directory choose your ADSS workspace location.
+		\end{enumerate}
+		\item if you are using Linux, wait a bit, someday somebody will put it online.
+	\end{itemize}
+	
+	Alternatively, if you are brave enough, you can setup a working Eclipse and download the source from SVN:
+	
+	\begin{enumerate}
+		\item download an Eclipse 4.x Mars for RCP and RAP Developers from \url{http://www.eclipse.org/} and install it;
+		\item launch Eclipse and install the following plug-ins:
+			\begin{itemize}
+				\item from \url{http://download.eclipse.org/releases/mars} install:
+				\begin{itemize}
+					\item Subversive SVN Team Provider;
+					\item EMF - Eclipse Modeling Framework Xcore SDK;
+					\item EMF - Eclipse Modeling Framework SDK.
+				\end{itemize}
+				\item from \url{http://www2.imm.dtu.dk/~ekki/projects/ePNK/indigo/update/} install:
+				\begin{itemize}
+					\item ePNK Basic Extensions;
+					\item ePNK Core;
+					\item ePNK HLPNGs.
+				\end{itemize}
+				\item from \url{http://download.eclipse.org/nattable/releases/1.4.0/repository/} install everything;
+				\item download \url{http://www2.cs.uni-paderborn.de/cs/kindler/research/EPCTools/downloads/epctools-2.0.3.plugin.eclipse-3.1.zip} and unzip it in you Eclipse plug-ins directory.
+			\end{itemize}
+		\item from Eclipse imports all the plug-ins from the SVN repository at \url{https://aspire-fp7.eu/framework/development/ADSS/} --- if asked for an SVN connector you can install SVNKit 1.8.x;
+		\item create an Enclipse launch configuration using all the plug-ins in the workspace;
+		\item for Windows only, modify the launch configuration in this way:
+		\begin{itemize}
+			\item add \texttt{-Djava.library.path="C:\\Program Files\\swipl\\bin"} to the VM arguments, specifying where you have installed SWI-Prolog binaries;
+			\item add the \texttt{SWI\_HOME\_DIR} environment variable pointing to your SWI-Prolog directory (e.g. \texttt{C:\\Program Files\\swipl});
+			\item add the \texttt{PATH} environment variable pointing to your SWI-Prolog binaries directory (e.g. \texttt{C:\\Program Files\\swipl\\bin}).
+		\end{itemize}
+	\end{enumerate}
+	
+	Remember to install Java, SWI-Prolog and Eclipse for 64 bit or for 32 bit OSses, without mixing them.
+	
+	Under a Debian/Ubuntu you can easily install the JRE and SWI-Prolog via the following command lines:
+	
+	\begin{quote}
+		\texttt{aptitude install openjdk-8-jre openjdk-8-jre-headless}\\
+		\texttt{aptitude install swi-prolog swi-prolog-java swi-prolog-nox}
+	\end{quote}
+	
+	\chapter{ADSS plug-ins}
+
+	The ADSS is split in several plug-ins, that are:
+	
+	\begin{itemize}
+		\item the \PlugIn{eu.aspire\_fp7.adss}, developed by POLITO, contains most of the logic of the ADSS;
+		\item the \PlugIn{eu.aspire\_fp7.adss.akb}, developed by POLITO, contains the AKB;
+		\item the \PlugIn{eu.aspire\_fp7.adss.akb.ui}, developed by POLITO, contains the AKB editor UI;
+		\item the \PlugIn{eu.aspire\_fp7.adss.help}, developed by POLITO, contains the ADSS help (and this manual);
+		\item the \PlugIn{eu.aspire\_fp7.adss.ui}, developed by POLITO, contains some common ADSS UI classes;
+		\item the \PlugIn{eu.aspire\_fp7.adss.util}, developed by POLITO, contains various utility methods;
+		\item the \PlugIn{it.polito.security.ontologies}, developed by POLITO, contains the ontology API;
+		\item the \PlugIn{org.uel.aspire.wp4.assessment}, developed by UEL, contains the Petri Nets API.
+	\end{itemize}
+
+	In addition you can also find two other (optional) plug-ins developed by POLITO:
+	
+	\begin{itemize}
+		\item the \PlugIn{it.polito.security.ontologies.samples} contains some ontology examples;
+		\item the \PlugIn{it.polito.security.ontologies.tools} contains some ontology analysis tools.
+	\end{itemize}
+	
+	\chapter{Accessing and expanding the AKB}
+	
+	Most of the AKB is stored into a central ontology that can be easily accessed via the \Method{ADSS.getModel()} method. It returns a \Class{Model} EMF object that contains all the information used by the ADSS. It can be freely read and modified using a set of getters and setters. You can also perform a low-level access to the ontology by using the \Method{Model.getOntology()} method.
+	
+	The AKB \Class{Model} class contains the following principal getter methos:
+	
+	\begin{description}[style = nextline, before=\normalfont, font = \normalfont\ttfamily]
+		\item[getOntology()] retrieves the ontology itself --- use it only if you are 100\% sure of what you are doing;
+		\item[getApplications()] retrieves the list of software applications --- this method may be removed in the future;
+		\item[getAttackPaths()] retrieves the list of detected attack paths;
+		\item[getAttackSteps()] retrieves the list of detected attack steps;
+		\item[getProtections()] retrieves the list of supported protections;
+		\item[getAttacker()] retrieves the attacker profile, containing data such as the expertise level and his budget threshold;
+		\item[getAttackerTools()] retrieves the list of supported attacker tools;
+		\item[getSolutions()] retrieves the inferred solutions.
+	\end{description}
+
+	You can access a stable AKB in several points, such as:
+	
+	\begin{itemize}
+		\item in the \Method{PetriNetsConnector.initialize()} method that it is called before actually calling the SPA tool to perform the Petri nets assessments;
+		\item in the \Method{PetriNetsConnector.compare()} method that it is called when comparing two solutions in order to find the best one.
+	\end{itemize}
+	
+	The developer can also choose to look into the following files for more information about what is inside the AKB:
+	
+	\begin{itemize}
+		\item the file \File{owl/akb.owl} in the \PlugIn{eu.aspire\_fp7.adss.akb} plug-in. It contains the initial OWL ontology loadead when a new project is created;
+		\item the file \File{xcore/akb.xcore} in the \PlugIn{eu.aspire\_fp7.adss.akb} plug-in. It contains the XCore model used to automatically generate the Java classes of the AKB. In here all the available getters and setters are also documented.
+	\end{itemize}
+	
+%	\section{Adding new attack steps}
+%	\section{Adding new attack tools}
+%	\section{Adding new protections}
+
+	\chapter{Modifying the UI}
+
+	\section{Adding new steps to the build process}
+	
+	First, note that adding a new build step requires \emph{only} modifying the UI, so that your additional code can be placed anywhere. Basically, there are two things to do: modify the build all and step-by-step actions. To add a new step:
+	
+	\begin{enumerate}
+		\item open the \Class{eu.aspire\_fp7.adss.akb.ui.editors.OverviewPage} class --- all the modifications must be performed here;
+		\item locate the \Method{createAutomaticBuildSection} method and add the new code to be executed to the listener of the \Object{buildAllHyperlink} class field --- this will take care of the `Build All' hyper-link;
+		\item create a new \Class{org.eclipse.ui.forms.widgets.ImageHyperlink} object as a new class field --- this widget will model the button used to launch the new step only;
+		\item locate the \Method{createStepByStepBuildSection} method, add the code to allocate the new hyper-link and set-up its listener accordingly --- this will take care of the `Step by Step Build` hyper-link.
+	\end{enumerate}
+
+	\section{Adding a new page to the AKB editor}
+	
+	This modification is very straightforward. To add a new page:
+	
+	\begin{itemize}
+		\item implement a new concrete class extending \Class{org.eclipse.ui.forms.editor.FormPage} containing the new custom content;
+		\item open the \Class{eu.aspire\_fp7.adss.akb.ui.editors.AKBEditor} class --- this class model the AKB editor as a whole;
+		\item modify the \Method{addPages} method in order to add the new page to the AKB editor.
+	\end{itemize}
+
+%	
+%	\chapter{Modifying the solvers}
+%	
+%	\todo[inline]{Yet to do. I'm very lazy\dots}
+%	
+%	\chapter{Modifying the UI}
+%	
+%	\todo[inline]{Yet to do. I'm super lazy\dots}
+%	
+%	\chapter{API}
+%
+%	\todo[inline]{Yet to do. I'm extraordinarily lazy\dots}
+\end{document}

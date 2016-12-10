@@ -1,0 +1,154 @@
+\documentclass[9pt]{scrartcl}
+
+\usepackage[utf8]{inputenc}
+\usepackage[margin = 2cm]{geometry}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+
+\title{First level protections evaluation process}
+\author{}
+\date{}
+
+\newcommand{\Property}[2]{\mathcal{P}^{#1}(#2)}
+\newcommand{\Overheadd}[2]{\mathcal{O}^{#1}(#2)}
+
+\newcommand{\Weight}[1]{\mathcal{W}(#1)}
+
+\newcommand{\Threshold}{\lambda}
+\newcommand{\PenaltyValue}{P}
+\newcommand{\MetricCoefficient}[2]{\alpha_{#1}^{#2}}
+\newcommand{\AttackCoefficient}[2]{\beta_{#1}^{#2}}
+\newcommand{\Probability}[1]{\pi^{#1}}
+\newcommand{\Expertise}{\epsilon}
+\newcommand{\Effort}[1]{\textsc{Effort}(#1)}
+
+\newcommand{\Evaluate}[1]{\textsc{Evaluate}(#1)}
+\newcommand{\Security}[1]{\textsc{Security}(#1)}
+\newcommand{\Overhead}[1]{\textsc{Overhead}(#1)}
+\newcommand{\Penalty}[1]{\textsc{Penalty}(#1)}
+\newcommand{\Broken}[1]{\textsc{Broken}(#1)}
+\newcommand{\Metric}[2]{\textsc{Metric}_{#1}(#2)}
+\newcommand{\OldMetric}[2]{\textsc{OldMetric}_{#1}(#2)}
+
+\begin{document}
+	\maketitle
+
+\section*{Core ideas}
+
+\begin{itemize}
+	\item white player: defender
+	\begin{itemize}
+		\item the first turn is for the defender
+	\end{itemize}
+	\item black player: attacker
+	\begin{itemize}
+		\item all the turns but the first are for the attacker
+	\end{itemize}
+	\item chessboard: the application
+	\begin{itemize}
+		\item the ADSS see the application as a set of metrics
+	\end{itemize}
+	\item given an asset $a_j$
+	\begin{itemize}
+		\item it has a set of enforced security properties $\Property{i}{a_j} \ge 0$, the higher the securer
+		\item in a vanilla application all the properties are zero
+		\item it has a set of overheads $\Overheadd{i}{a_j} \ge 0$
+		\item a weight $\Weight{a_j} \ge 0$
+	\end{itemize}
+	\item defender moves: solutions (combination of protections)
+	\begin{itemize}
+		\item solutions increase the property values
+	\end{itemize}
+	\item attacker moves: attack paths
+	\begin{itemize}
+		\item attack paths decrease the property values
+	\end{itemize}
+	\item victory
+	\begin{itemize}
+		\item attacker: when at least one security property goes below some threshold $\Threshold$
+		\item defender: never, so he tries to delay the attacker victory, pushing it down in the search tree
+	\end{itemize}
+\end{itemize}
+
+\section*{Leaves evaluation}
+
+\begin{align*}
+	\Evaluate{n} & = \Security{n} - \Overhead{n} - \Penalty{n}\\
+	\Security{n} & = \sum_i \sum_j \Property{i}{a_j}\\
+	\Overhead{n} & = \sum_i \sum_j \Overheadd{i}{a_j}\\
+	\Penalty{n} & = \PenaltyValue \cdot \sum_j \Weight{a_j} \cdot \Broken{a_j}
+\end{align*}
+
+\begin{itemize}
+	\item a leaf $n$ is informally a protected application attacked with some attack paths
+	\item $0 \ll \PenaltyValue < \infty$ is a very big user constant
+	\item $\Broken{a_j}$ is the number of broken properties whose value is less than the threshold $\Threshold$
+\end{itemize}
+
+\section*{Properties evaluation}
+
+\begin{align*}
+	\Property{i}{a_j} & = \Weight{a_j} \cdot \sum_k \MetricCoefficient{k}{i} \cdot \Metric{k}{a_j}
+\end{align*}
+
+\begin{itemize}
+	\item $\Property{i}{a_j}$ is the value of the $i$-th property on the asset $a_j$
+	\item $\Metric{k}{a_j}$ is the delta of the $k$-th metric w.r.t. the vanilla application for the asset $a_j$
+	\item $\MetricCoefficient{k}{i} \ge 0$ is a coefficient relating the $i$-th property to the $k$-th metric
+\end{itemize}
+
+\newpage
+
+\section*{Playing a solution}
+
+\begin{itemize}
+	\item when a solution is played
+		\begin{itemize}
+			\item it increases the metrics
+			\item it increases  the overheads
+		\end{itemize}
+	\item metrics can be computed via the ACTC or estimated via formulas
+	\item overheads are computed via the PIs' formulas
+\end{itemize}
+
+\section*{Playing an attack path}
+
+\begin{align*}
+	\Metric{k}{a_j} & = \Probability{i} \cdot \AttackCoefficient{k}{i} \cdot \OldMetric{k}{a_j}\\
+	\Probability{i} & = \Expertise / \Effort{i}
+\end{align*}
+
+\begin{itemize}
+	\item when an attack path is played it decreases the metrics
+	\begin{itemize}
+		\item if the attack is active it changes the code
+		\item if the attack is passive it bypasses the code complexity, emulating a sort of code simplification
+	\end{itemize}
+	\item $0 \le \AttackCoefficient{k}{i} \le 1$ is a coefficient stating how the $i$-th attack path influences the $k$-th metric
+	\begin{itemize}
+		\item can be inferred by looking at the attack steps and their types
+		\item the user can give a constant for each attack step type
+		\item these values become $\AttackCoefficient{k}{i}$ if the attack path contains the related attack step types
+	\end{itemize}
+	\item $0 \le \Probability{i} \le 1$ is the probability to execute the $i$-th attack path
+	\item $0 < \epsilon \le 1$ is a constant for the attacker expertise
+	\item $\Effort{i}$ is the effort of the $i$-th attack path (computed with the UEL formulas)
+\end{itemize}
+
+\newpage
+
+\section*{Approximating the metrics}
+
+\subsection*{Formulas}
+
+\begin{align*}
+	M_i = \bar{M}_i \cdot A_i + B_i
+\end{align*}
+
+\begin{itemize}
+	\item we suppose PI independence
+	\item we have: $c$ code correlation sets with $a$ assets each one, $p$ PIs per asset and $m$ metrics per asset
+	\item $M_i$ is a matrix where the $(j, k)$ element if the $k$-th metric for the $j$-th asset
+\end{itemize}
+
+\end{document}

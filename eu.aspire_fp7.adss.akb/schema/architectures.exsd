@@ -1,0 +1,156 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="eu.aspire_fp7.adss.akb.architectures" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="eu.aspire_fp7.adss.akb.architectures" id="eu.aspire_fp7.adss.akb.architectures" name="AKB architectures"/>
+      </appinfo>
+      <documentation>
+         This extension point is used to add new architectures to the AKB.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="architecture" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="architecture">
+      <annotation>
+         <documentation>
+            A new AKB architecture.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The name of the architecture.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="sizeOfShortInt" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The size of a short int data type in bytes.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="sizeOfInt" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The size of a int data type in bytes.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="sizeOfLongInt" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The size of a long int data type in bytes.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="sizeOfLongLongInt" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The size of a long long int data type in bytes.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="sizeOfFloat" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The size of a float data type in bytes.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="sizeOfDouble" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The size of a double data type in bytes.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="sizeOfLongDouble" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The size of a long double data type in bytes.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         [Enter the first release in which this extension point appears.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         [Enter extension point usage example here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="apiinfo"/>
+      </appinfo>
+      <documentation>
+         [Enter API information here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="implementation"/>
+      </appinfo>
+      <documentation>
+         [Enter information about supplied implementation of this extension point.]
+      </documentation>
+   </annotation>
+
+
+</schema>

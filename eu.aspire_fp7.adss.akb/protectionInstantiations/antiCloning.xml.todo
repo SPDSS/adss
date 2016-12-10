@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<protectionInstantiationsList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://protectionInstantiation.akb.adss.aspire_fp7.eu" xsi:schemaLocation="../schema/protectionInstantiation.xsd">
+	<protectionInstantiation>
+		<protectionInstantiationName>anti-cloning, silent report</protectionInstantiationName>
+		<protectionName>antiCloning</protectionName>
+		<variableAnnotation>status</variableAnnotation>
+		<toolForDeployment>ASCL</toolForDeployment>
+		<toolForDeployment>anti-cloning backend (opt/anti_cloning/server/AntiCloningBackend.py)</toolForDeployment>
+		<toolForDeployment>remote attestation DB</toolForDeployment>
+		<clientTimeOverhead>1.01</clientTimeOverhead>
+ 		<clientMemoryOverhead>1.02</clientMemoryOverhead>
+		<serverTimeOverhead>1.01</serverTimeOverhead>
+ 		<serverMemoryOverhead>1</serverMemoryOverhead>
+ 		<networkOverhead>1.01</networkOverhead>
+	</protectionInstantiation>
+	<protectionInstantiation>
+		<protectionInstantiationName>anti-cloning, pro-active report</protectionInstantiationName>
+		<protectionName>antiCloning</protectionName>
+		<variableAnnotation>decision(#variable#)</variableAnnotation>
+		<toolForDeployment>ASCL</toolForDeployment>
+		<toolForDeployment>anti-cloning backend (opt/anti_cloning/server/AntiCloningBackend.py)</toolForDeployment>
+		<toolForDeployment>remote attestation DB</toolForDeployment>
+		<clientTimeOverhead>1.02</clientTimeOverhead>
+ 		<clientMemoryOverhead>1.02</clientMemoryOverhead>
+		<serverTimeOverhead>1.02</serverTimeOverhead>
+ 		<serverMemoryOverhead>1</serverMemoryOverhead>
+ 		<networkOverhead>1.02</networkOverhead>
+	</protectionInstantiation>
+</protectionInstantiationsList>

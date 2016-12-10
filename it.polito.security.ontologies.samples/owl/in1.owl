@@ -1,0 +1,169 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+]>
+
+
+<rdf:RDF xmlns="http://security.polito.it/ontologies/samples/in1.owl#"
+     xml:base="http://security.polito.it/ontologies/samples/in1.owl"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+    <owl:Ontology rdf:about="http://security.polito.it/ontologies/samples/in1.owl"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Datatypes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://security.polito.it/ontologies/samples/in1.owl#hasObject -->
+
+    <owl:ObjectProperty rdf:about="http://security.polito.it/ontologies/samples/in1.owl#hasObject"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://security.polito.it/ontologies/samples/in1.owl#hasBoolean -->
+
+    <owl:DatatypeProperty rdf:about="http://security.polito.it/ontologies/samples/in1.owl#hasBoolean">
+        <rdfs:range rdf:resource="&xsd;boolean"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://security.polito.it/ontologies/samples/in1.owl#hasDouble -->
+
+    <owl:DatatypeProperty rdf:about="http://security.polito.it/ontologies/samples/in1.owl#hasDouble">
+        <rdfs:range rdf:resource="&xsd;double"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://security.polito.it/ontologies/samples/in1.owl#hasFloat -->
+
+    <owl:DatatypeProperty rdf:about="http://security.polito.it/ontologies/samples/in1.owl#hasFloat">
+        <rdfs:range rdf:resource="&xsd;float"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://security.polito.it/ontologies/samples/in1.owl#hasInteger -->
+
+    <owl:DatatypeProperty rdf:about="http://security.polito.it/ontologies/samples/in1.owl#hasInteger">
+        <rdfs:range rdf:resource="&xsd;integer"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://security.polito.it/ontologies/samples/in1.owl#hasString -->
+
+    <owl:DatatypeProperty rdf:about="http://security.polito.it/ontologies/samples/in1.owl#hasString">
+        <rdfs:range rdf:resource="&xsd;string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://security.polito.it/ontologies/samples/in1.owl#Bar -->
+
+    <owl:Class rdf:about="http://security.polito.it/ontologies/samples/in1.owl#Bar">
+        <rdfs:subClassOf rdf:resource="http://security.polito.it/ontologies/samples/in1.owl#Foo"/>
+    </owl:Class>
+    
+
+
+    <!-- http://security.polito.it/ontologies/samples/in1.owl#Baz -->
+
+    <owl:Class rdf:about="http://security.polito.it/ontologies/samples/in1.owl#Baz">
+        <owl:disjointWith rdf:resource="http://security.polito.it/ontologies/samples/in1.owl#Foo"/>
+    </owl:Class>
+    
+
+
+    <!-- http://security.polito.it/ontologies/samples/in1.owl#Foo -->
+
+    <owl:Class rdf:about="http://security.polito.it/ontologies/samples/in1.owl#Foo"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://security.polito.it/ontologies/samples/in1.owl#a -->
+
+    <owl:NamedIndividual rdf:about="http://security.polito.it/ontologies/samples/in1.owl#a">
+        <rdf:type rdf:resource="http://security.polito.it/ontologies/samples/in1.owl#Foo"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://security.polito.it/ontologies/samples/in1.owl#b -->
+
+    <owl:NamedIndividual rdf:about="http://security.polito.it/ontologies/samples/in1.owl#b">
+        <rdf:type rdf:resource="http://security.polito.it/ontologies/samples/in1.owl#Bar"/>
+        <hasDouble rdf:datatype="&xsd;double">1.0</hasDouble>
+        <hasFloat rdf:datatype="&xsd;float">2.0</hasFloat>
+        <hasInteger rdf:datatype="&xsd;integer">3</hasInteger>
+        <hasBoolean rdf:datatype="&xsd;boolean">true</hasBoolean>
+        <hasObject rdf:resource="http://security.polito.it/ontologies/samples/in1.owl#a"/>
+        <hasObject rdf:resource="http://security.polito.it/ontologies/samples/in1.owl#b"/>
+    </owl:NamedIndividual>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 3.2.5.1912) http://owlapi.sourceforge.net -->
+

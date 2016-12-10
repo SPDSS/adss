@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (c) 2016 Politecnico di Torino.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+   
+    Contributors:
+        Politecnico di Torino - initial API and implementation
+ -->
+
+<protectionInstantiationsList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://protectionInstantiation.akb.adss.aspire_fp7.eu" xsi:schemaLocation="../schema/protectionInstantiation.xsd">
+	<!--
+	     * the overhead is an *approximation*, for which I'll be using an additional metric called #nr_bbls_static#, #nr_bbls_dynamic_size# and #nr_bbls_dynamic#. However, these are not yet supported by the metrics
+	       but you can approximate both by nr_ins_static/8 and nr_ins_dynamic/8 etc.
+	     * The model here is approximately correct, but there are various unknown (for known) variables involved. Reasoning:
+	       - We have a fixed cost to initialize the anti-debugger. This can be seen as a fixed amount of additionally executed instructions. However, this also involves context switches
+	         and kernel code, so we'll never know the exact overhead, but at least we can try to make estimates later when we measure it. Initial guess: 20000 instructions.
+	       - Per switch to the debugger (and back) we also have a fixed cost (also involves kernel code and process switching alas). Initial guess: 2000 instructions
+	         However! Note that there can be multiple switches per region! There is no good way to guesstimate this right now :-( So another guesstimate: on average 1 switch per 4 (dynamic) BBLs
+	       - Memory accesses have to be wrapped in calls to the anti-debugger. Two unknowns here: the number of accesses, and the overhead in instructions per access (again, this involves the kernel).
+	         Guess for the number of memory accesses: 1 out of 4 instructions; guess for the overhead: 1000.
+	     * As in CFG Obfuscations, we count the overhead compared to the number of executed instructions
+	     * TODO: we had different levels of 'overhead' foreseen, but these are right now all result in the same transformations in Diablo....
+	     * This leads us to:
+	       startup_cost = 20000
+	       switch_cost = 2000
+	       memory_access_overhead = 1000
+	       estimated_nr_switches = 0.25 * #nr_bbls_dynamic_size#
+	       estimated_nr_mem_accesses = 0.25 * #nr_ins_dynamic_size#
+	       total_additional_instructions = startup_cost + estimated_nr_switches * switch_cost + estimated_nr_mem_accesses * memory_access_overhead
+
+	       =>
+
+	       clientTimeOverhead = (#nr_ins_dynamic_size# + total_additional_instructions) / #nr_ins_dynamic_size#
+	                          = 1 + total_additional_instructions / #nr_ins_dynamic_size#
+	                          = 1 + (20000 + 0.25 * #nr_bbls_dynamic_size# * 2000 + 0.25 * #nr_bbls_dynamic_size# * 1000) / #nr_ins_dynamic_size#
+	-->
+	     
+	<protectionInstantiation>
+		<protectionInstantiationName>Anti-Debugging</protectionInstantiationName>
+		<protectionName>antiDebugging</protectionName>
+		<codeRegionAnnotation>anti_debugging</codeRegionAnnotation>
+		<clientTimeOverhead>1 + (20000 + 0.25 * #nr_bbls_dynamic_size# * 2000 + 0.25 * #nr_bbls_dynamic_size# * 1000) / #nr_ins_dynamic_size#</clientTimeOverhead>
+ 		<clientMemoryOverhead>1</clientMemoryOverhead>
+		<serverTimeOverhead>1</serverTimeOverhead>
+ 		<serverMemoryOverhead>1</serverMemoryOverhead>
+ 		<networkOverhead>1</networkOverhead>
+	</protectionInstantiation>
+</protectionInstantiationsList>

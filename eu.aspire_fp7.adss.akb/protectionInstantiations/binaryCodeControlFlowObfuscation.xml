@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (c) 2016 Politecnico di Torino.
+    All rights reserved. This program and the accompanying materials
+    are made available under the terms of the Eclipse Public License v1.0
+    which accompanies this distribution, and is available at
+    http://www.eclipse.org/legal/epl-v10.html
+   
+    Contributors:
+        Politecnico di Torino - initial API and implementation
+ -->
+
+<protectionInstantiationsList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://protectionInstantiation.akb.adss.aspire_fp7.eu" xsi:schemaLocation="../schema/protectionInstantiation.xsd">
+	<!--
+	     * the overhead is an *approximation*, for which I'll be using an additional metric called #nr_bbls_static#, #nr_bbls_dynamic_size# and #nr_bbls_dynamic#. However, these are not yet supported by the metrics
+	       but you can approximate both by nr_ins_static/8 and nr_ins_dynamic/8 etc.
+	     * For now, I've left clientMemoryOverhead to 1. Technically, if you add obfuscations, the program size will increase a tiny bit, which will also make that the client's memory overhead
+	       will technically be slightly larger. However, I've seen no other instantiation do it, so for now I'll keep it at 1.
+	     * These are all educated guesses and very rough approximations, they are not validated!
+	-->
+
+	<!-- The approximations for flatten_function are probably not very good, because it only looks at instructions, not at branch predictor misses etc. If need be you could probably add a constant
+	     multiplicative factor to model this though...
+	     Furthermore it's only really valid when the flattened BBLs are merged per region, and not across multiple regions...
+	     
+	     The reasoning for the approximation is as follows:
+	     * The switch BBL gives an overhead of 3 (static) instructions.
+	     * Each transformed BBL is furthermore extended with a worst-case maximum of 7 additional instructions (POP+B; PUSH+MOV+MOVcc+ADD+BX)
+	     * So, dynamically speaking, to execute each BBL, we now add 10 instructions to the dynamic instruction count
+	     * If the percent_apply is 0.10, the 10% least executed code is transformed (for now). Thus, as an approximation, we check the percentage of BBLs that is executed in this region.
+	       The difference between this and the percent_apply is the percent that is transformed AND executed. Note that we should not let this go below 0, so we have a max() here...
+	       This will be used as a very rough estimate to scale the number of dynamic BBL executions with....
+
+	     So:
+	       executed_percentage_transformed_estimate = max(0, #nr_bbls_dynamic_size# / #nr_bbls_static_size# - percent_apply/100)
+	       overhead_per_bbl = 10
+	       nr_transformed_and_executed_executions = executed_percentage_transformed_estimate * #nr_bbls_dynamic_size#
+	       additional_executed_instructions = overhead_per_bbl * nr_transformed_and_executed_executions
+	       clientTimeOverhead = (#nr_ins_dynamic_size# + additional_executed_instructions) / #nr_ins_dynamic_size#    /* So 1.0 is no dynamic overhead; 2.0 is double the execution time, etc */
+	                          = 1 + additional_executed_instructions / #nr_ins_dynamic_size#
+	       =>
+	       clientTimeOverhead = 1 + (10 * max(0, #nr_bbls_dynamic_size# / #nr_bbls_static_size# - percent_apply/100) * #nr_bbls_dynamic_size#) / #nr_ins_dynamic_size#
+ 
+
+	-->
+	<protectionInstantiation>
+		<protectionInstantiationName>Binary Obfuscation (flatten function, low overhead)</protectionInstantiationName>
+		<protectionName>binaryCodeControlFlowObfuscation</protectionName>
+		<codeRegionAnnotation>obfuscations,enable_obfuscation(flatten_function:percent_apply=10)</codeRegionAnnotation>
+		<clientTimeOverhead>   1 + (10 * max(0, #nr_bbls_dynamic_size# / #nr_bbls_static_size# - 10/100) * #nr_bbls_dynamic_size#) / #nr_ins_dynamic_size# </clientTimeOverhead>
+ 		<clientMemoryOverhead>1</clientMemoryOverhead>
+		<serverTimeOverhead>1</serverTimeOverhead>
+ 		<serverMemoryOverhead>1</serverMemoryOverhead>
+ 		<networkOverhead>1</networkOverhead>
+	</protectionInstantiation>
+	<protectionInstantiation>
+		<protectionInstantiationName>Binary Obfuscation (flatten function, medium overhead)</protectionInstantiationName>
+		<protectionName>binaryCodeControlFlowObfuscation</protectionName>
+		<codeRegionAnnotation>obfuscations,enable_obfuscation(flatten_function:percent_apply=20)</codeRegionAnnotation>
+		<clientTimeOverhead>   1 + (10 * max(0, #nr_bbls_dynamic_size# / #nr_bbls_static_size# - 20/100) * #nr_bbls_dynamic_size#) / #nr_ins_dynamic_size# </clientTimeOverhead>
+ 		<clientMemoryOverhead>1</clientMemoryOverhead>
+		<serverTimeOverhead>1</serverTimeOverhead>
+ 		<serverMemoryOverhead>1</serverMemoryOverhead>
+ 		<networkOverhead>1</networkOverhead>
+	</protectionInstantiation>
+	<protectionInstantiation>
+		<protectionInstantiationName>Binary Obfuscation (flatten function, high overhead)</protectionInstantiationName>
+		<protectionName>binaryCodeControlFlowObfuscation</protectionName>
+		<codeRegionAnnotation>obfuscations,enable_obfuscation(flatten_function:percent_apply=30)</codeRegionAnnotation>
+		<clientTimeOverhead>   1 + (10 * max(0, #nr_bbls_dynamic_size# / #nr_bbls_static_size# - 30/100) * #nr_bbls_dynamic_size#) / #nr_ins_dynamic_size# </clientTimeOverhead>
+ 		<clientMemoryOverhead>1</clientMemoryOverhead>
+		<serverTimeOverhead>1</serverTimeOverhead>
+ 		<serverMemoryOverhead>1</serverMemoryOverhead>
+ 		<networkOverhead>1</networkOverhead>
+	</protectionInstantiation>
+
+	<!-- Branch functions. Again, this does not take into account the overhead due to increased branch misses!
+	     Same reasoning as above, but now we have an overhead of maximum 7 instructions per BBL execution: and optional PUSH+POP pair, ADR + LDR + SUB + BX + ADD
+	-->
+	<protectionInstantiation>
+		<protectionInstantiationName>Binary Obfuscation (branch function, low overhead)</protectionInstantiationName>
+		<protectionName>binaryCodeControlFlowObfuscation</protectionName>
+		<codeRegionAnnotation>obfuscations,enable_obfuscation(branch_function:percent_apply=10)</codeRegionAnnotation>
+		<clientTimeOverhead>   1 + (7 * max(0, #nr_bbls_dynamic_size# / #nr_bbls_static_size# - 10/100) * #nr_bbls_dynamic_size#) / #nr_ins_dynamic_size# </clientTimeOverhead>
+ 		<clientMemoryOverhead>1</clientMemoryOverhead>
+		<serverTimeOverhead>1</serverTimeOverhead>
+ 		<serverMemoryOverhead>1</serverMemoryOverhead>
+ 		<networkOverhead>1</networkOverhead>
+	</protectionInstantiation>
+	<protectionInstantiation>
+		<protectionInstantiationName>Binary Obfuscation (branch function, medium overhead)</protectionInstantiationName>
+		<protectionName>binaryCodeControlFlowObfuscation</protectionName>
+		<codeRegionAnnotation>obfuscations,enable_obfuscation(branch_function:percent_apply=20)</codeRegionAnnotation>
+		<clientTimeOverhead>   1 + (7 * max(0, #nr_bbls_dynamic_size# / #nr_bbls_static_size# - 20/100) * #nr_bbls_dynamic_size#) / #nr_ins_dynamic_size# </clientTimeOverhead>
+ 		<clientMemoryOverhead>1</clientMemoryOverhead>
+		<serverTimeOverhead>1</serverTimeOverhead>
+ 		<serverMemoryOverhead>1</serverMemoryOverhead>
+ 		<networkOverhead>1</networkOverhead>
+	</protectionInstantiation>
+	<protectionInstantiation>
+		<protectionInstantiationName>Binary Obfuscation (branch function, high overhead)</protectionInstantiationName>
+		<protectionName>binaryCodeControlFlowObfuscation</protectionName>
+		<codeRegionAnnotation>obfuscations,enable_obfuscation(branch_function:percent_apply=30)</codeRegionAnnotation>
+		<clientTimeOverhead>   1 + (7 * max(0, #nr_bbls_dynamic_size# / #nr_bbls_static_size# - 30/100) * #nr_bbls_dynamic_size#) / #nr_ins_dynamic_size# </clientTimeOverhead>
+ 		<clientMemoryOverhead>1</clientMemoryOverhead>
+		<serverTimeOverhead>1</serverTimeOverhead>
+ 		<serverMemoryOverhead>1</serverMemoryOverhead>
+ 		<networkOverhead>1</networkOverhead>
+	</protectionInstantiation>
+
+	<!-- Opaque predicates. Same reasoning as above. However, opaque predicates can choose out of many different predicates, each with a different number of instructions.
+	     So I average them out. However, there is one predicate that has a loop in it, so there is a variable execution count. We could just disable that if this turns out to be too bad in the estimations...
+	     Average of (5,4,4,5,3,8,9,11[,128*4 on average for the optional loopy one]) = 62....
+	-->
+	<protectionInstantiation>
+		<protectionInstantiationName>Binary Obfuscation (opaque_predicate, low overhead)</protectionInstantiationName>
+		<protectionName>binaryCodeControlFlowObfuscation</protectionName>
+		<codeRegionAnnotation>obfuscations,enable_obfuscation(opaque_predicate:percent_apply=10)</codeRegionAnnotation>
+		<clientTimeOverhead>   1 + (62 * max(0, #nr_bbls_dynamic_size# / #nr_bbls_static_size# - 10/100) * #nr_bbls_dynamic_size#) / #nr_ins_dynamic_size# </clientTimeOverhead>
+ 		<clientMemoryOverhead>1</clientMemoryOverhead>
+		<serverTimeOverhead>1</serverTimeOverhead>
+ 		<serverMemoryOverhead>1</serverMemoryOverhead>
+ 		<networkOverhead>1</networkOverhead>
+	</protectionInstantiation>
+	<protectionInstantiation>
+		<protectionInstantiationName>Binary Obfuscation (opaque predicate, medium overhead)</protectionInstantiationName>
+		<protectionName>binaryCodeControlFlowObfuscation</protectionName>
+		<codeRegionAnnotation>obfuscations,enable_obfuscation(opaque_predicate:percent_apply=20)</codeRegionAnnotation>
+		<clientTimeOverhead>   1 + (62 * max(0, #nr_bbls_dynamic_size# / #nr_bbls_static_size# - 20/100) * #nr_bbls_dynamic_size#) / #nr_ins_dynamic_size# </clientTimeOverhead>
+ 		<clientMemoryOverhead>1</clientMemoryOverhead>
+		<serverTimeOverhead>1</serverTimeOverhead>
+ 		<serverMemoryOverhead>1</serverMemoryOverhead>
+ 		<networkOverhead>1</networkOverhead>
+	</protectionInstantiation>
+	<protectionInstantiation>
+		<protectionInstantiationName>Binary Obfuscation (opaque predicate, high overhead)</protectionInstantiationName>
+		<protectionName>binaryCodeControlFlowObfuscation</protectionName>
+		<codeRegionAnnotation>obfuscations,enable_obfuscation(opaque_predicate:percent_apply=30)</codeRegionAnnotation>
+		<clientTimeOverhead>   1 + (62 * max(0, #nr_bbls_dynamic_size# / #nr_bbls_static_size# - 30/100) * #nr_bbls_dynamic_size#) / #nr_ins_dynamic_size# </clientTimeOverhead>
+ 		<clientMemoryOverhead>1</clientMemoryOverhead>
+		<serverTimeOverhead>1</serverTimeOverhead>
+ 		<serverMemoryOverhead>1</serverMemoryOverhead>
+ 		<networkOverhead>1</networkOverhead>
+	</protectionInstantiation>
+
+</protectionInstantiationsList>

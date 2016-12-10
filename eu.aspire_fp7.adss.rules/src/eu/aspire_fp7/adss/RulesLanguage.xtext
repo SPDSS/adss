@@ -1,0 +1,28 @@
+grammar eu.aspire_fp7.adss.RulesLanguage with org.eclipse.xtext.common.Terminals
+
+generate rulesLanguage "http://www.aspire_fp7.eu/adss/RulesLanguage"
+
+Model:
+	rules+=Rule*;
+	
+Rule:
+	(name=ID ":")? "if" conditions+=Condition ("," conditions+=Condition)* "then" action=Action;
+
+Condition:
+	FunctionDeclaration;
+
+FunctionDeclaration:
+	name=ID "(" parameters+=ParameterType? ("," parameters+=ParameterType)* ")";
+
+enum ParameterType:
+	IGNORE = "_" |
+	CRYPTOGRAPHIC_KEY = "cryptographicKey" |
+	INITIALIZATION_VECTOR = "initializationVector" |
+	PLAINTEXT = "plaintext" |
+	CIPHERTEXT = "ciphertext";
+
+enum Action:
+	DECRYPT_AES128_CBC = "decrypt:AES128-CBC" |
+	DECRYPT_AES128_ECB = "decrypt:AES128-ECB" |
+	ENCRYPT_AES128_CBC = "encrypt:AES128-CBC" |
+	ENCRYPT_AES128_ECB = "encrypt:AES128-ECB";

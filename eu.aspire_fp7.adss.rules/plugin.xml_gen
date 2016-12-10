@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+	<extension point="org.eclipse.emf.ecore.generated_package">
+		<package 
+			uri = "http://www.aspire_fp7.eu/adss/RulesLanguage"
+			class = "eu.aspire_fp7.adss.rulesLanguage.RulesLanguagePackage"
+			genModel = "model/generated/RulesLanguage.genmodel" />
+	</extension>
+</plugin>

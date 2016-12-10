@@ -1,0 +1,229 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Name:        (export-functions-on-file)
+;; Args:        filename : STRING
+;; Returns:     UNDEFINED
+;; Example:     (export-functions-on-file "/path/to/location/file.c")
+;; Action:
+;;      Writes functions on file. Filename is created from file.c. ".functions" is used 
+;;		as suffix for the filename
+;; Errors:      
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define (export-functions-on-file filename)
+    	(with-output-to-file (create-filename "adss" ".functions") (lambda () (calculate-functions filename)))
+)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Name:        (calculate-functions)
+;; Args:       	filename: STRING
+;; Returns:     none
+;; Example:     (calculate-functions "/path/to/location/file.c")
+;; Action:
+;;      Computes user-defined functions and variables that are killed in each function
+;;		Displays function name funname followed by list of variable definitions that
+;;		occur in funname as follows:
+;;		days_at_month
+;;			[ABS_LOC Local y-51] @ 97
+;;		where days_at_month is the name of the function and the ABS-LOC represents
+;;		variable y that is defined at line 97. 51 is a numeric id that CodeSurfer 
+;;		assigns to variables
+;; Errors:      
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define (calculate-functions filename)
+	(for-each
+    	(lambda (pdg)
+		(if ( not (equal? (pdg-kind pdg) 'undefined))
+		(begin
+			(display (pdg-kind pdg))(display " ")(display (pdg-friendly-name pdg))(display " ")(display (pdg-compilation-unit pdg))
+			(if(not(equal? (pdg-vertex-file-line (pdg-entry-vertex pdg)) '#f))
+			(begin
+				(display " ")(display (cdr (pdg-vertex-file-line (pdg-entry-vertex pdg))))
+			))
+			(if(not(equal? (pdg-vertex-file-line (pdg-exit-vertex pdg)) '#f))
+			(begin
+				(display " ")(display (cdr (pdg-vertex-file-line (pdg-exit-vertex pdg))))
+			))
+			(display " ")(display (abs-loc-static-function? (pdg-abs-loc pdg)))
+			(display "\n")
+      		(for-each
+        	(lambda (v)
+           	(let ((current-sfid (get-sfid filename)) 
+           		 (vertex-sfid (pdg-vertex-file-line v)) 
+           		 ;(aloc-set (pdg-vertex-ids-cond-killed v)))
+           		 (aloc-set (pdg-vertex-ids-decl-uses v)))
+           		 ;(aloc-set (pdg-vertex-ids-killed v)))
+          		(if (not (abs-loc-set-empty? aloc-set))
+              	(begin
+                	(if (not (equal? vertex-sfid #f))
+                  	(begin
+                    	(if (equal? (car vertex-sfid) current-sfid)
+                      	(begin
+                        	(for-each
+                          	(lambda (aloc)
+								(begin
+									(display aloc)
+									(display " kind ")(display (abs-loc-kind aloc))
+									(display " @ ") (display (cdr (pdg-vertex-file-line v)))
+									(if(not(equal? (abs-loc-primary-declaration aloc) '#f))
+										(begin
+										(if(not(equal? (pdg-vertex-file-line (abs-loc-primary-declaration aloc)) '#f))
+										(begin
+											(display " decl@ ") (display (cdr (pdg-vertex-file-line (abs-loc-primary-declaration aloc))))
+										) (display " decl@ 0"))
+									)(display " decl@ 0"))
+									
+									(for-each
+									(lambda (current-ast-family)
+									(if (and (not (equal? (abs-loc-type aloc current-ast-family) '#f)) (not (equal? (abs-loc-ast aloc current-ast-family) '#f))	)
+										(begin
+											(display " type ") (display (ast-class-name(ast-class(abs-loc-type aloc current-ast-family))))
+											(if(equal? (ast-class-name(ast-class(abs-loc-type aloc current-ast-family))) 'c:integer)
+												(begin
+													(display " integertype ")
+													(display(ast-field(abs-loc-type aloc current-ast-family):integer-kind))
+													(display " ")
+													(display(ast-field(abs-loc-type aloc current-ast-family):size))
+												)
+											)
+											(if(equal? (ast-class-name(ast-class(abs-loc-type aloc current-ast-family))) 'c:array)
+												(begin
+													(display " arraytype ")
+													(if(equal? (ast-class-name(ast-class(ast-field (abs-loc-type aloc current-ast-family) :element-type))) 'c:integer)
+													(begin
+														(display(ast-field(ast-field(abs-loc-type aloc current-ast-family):element-type):integer-kind))
+														(display " ")
+														(display(ast-field(ast-field(abs-loc-type aloc current-ast-family):element-type):size))
+													)(display (ast-class-name(ast-class(ast-field (abs-loc-type aloc current-ast-family) :element-type)))))
+												)
+											)
+										)
+	                            	))
+                            		(ast-all-families))
+                            		
+                            		) (display "\n"))
+										
+                          	(abs-loc-set->list aloc-set))))))))))
+      (pdg-vertex-set->list (pdg-vertices pdg)))
+    )))
+  (sdg-pdgs))
+  )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Name:        (resolve-pointers-to-pointers)
+;; Args:       	ast-field-pointed-to: AST
+;; Returns:     STRING
+;; Example:     (resolve-pointers-to-pointers ast-field-pointed-to)
+;; Action:
+;;      Return the final pointed type in a chain of pointers to pointers.
+;; Errors:      
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(define (resolve-pointers-to-pointers ast-field-pointed-to)
+	(display (string-append ))
+	(lambda (ast-field-pointed-to)
+		(let (new-ast-field-pointed-to (ast-field ast-field-pointed-to :pointed-to))
+			(if(equal? (ast-class-name(ast-class(new-ast-field-pointed-to))) 'c:pointer)
+				(begin
+					(lambda (new-ast-field-pointed-to)
+						(resolve-pointers-to-pointers new-ast-field-pointed-to)
+					)
+				)
+				(if(equal? (ast-class-name(ast-class(new-ast-field-pointed-to))) 'c:integer)
+					(begin
+						;(ast-field (new-ast-field-pointed-to) :integer-kind)
+					)
+					;(ast-class-name(ast-class(ast-field (new-ast-field-pointed-to) :pointed-to)))
+				)
+			)	
+		)
+	)
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Name:        (get-sfid)
+;; Args:       	fname: STRING
+;; Returns:     SFID
+;; Example:     (get-sfid "/path/to/location/file.c")
+;; Action:
+;;      Returns the SFID associated to file.c
+;; Errors:      
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define (get-sfid fname)
+  (let ((fname-uid (assoc (expand-file-name fname) 
+                          (map
+                           (lambda(uid)
+                             (cons (file-get-name uid) uid))
+                           (sdg-uids)))))
+
+    (if fname-uid
+        (let* ((uid (cdr fname-uid))
+               (sfid (file-uid->sfid uid)))
+          sfid)
+        #f)))
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Name:        (create-filename)
+;; Args:        prefix: STRING
+;;				file: STRING
+;; Returns:     UNDEFINED
+;; Example:     (create-filename "/path/to/location/file.c" ".functions")
+;; Action:
+;;      Creates filename to write current analysis
+;; Errors:      
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define (create-filename filename suffix)
+    (string-append (list->string (manipulate-filename (reverse (string->list filename)))) suffix)
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Name:        (manipulate-filename)
+;; Args:        str-list: list of characters
+;; Returns:     STRING
+;; Example:     (manipulate-filename <list-of-char>)
+;; Action:
+;;     Modifies the list str-list of characters, which represents the current filename, 
+;;	   by substituting characters to make filename more suitable for printing
+;;
+;; Errors:      
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define (manipulate-filename str-list)
+  (let change-chars 
+    (
+      (charset str-list)
+      (new-charset '())
+    )
+    (cond
+      ((equal? charset '())
+        (reverse new-charset))
+      ((equal? (car charset) #\_)
+        (change-chars
+          (cdr charset)
+          (append new-charset (list #\_))
+          ))
+      ((equal? (car charset) #\/)
+        (change-chars
+          '()
+          new-charset
+          ))
+      (else
+        (change-chars
+          (cdr charset)
+          (append new-charset (list (char-downcase (car charset))))
+          ))
+    )
+  )
+  )
+
+;; main call to function export-functions-on-file
+;; argument is extracted from global variable userargv
+
+(export-functions-on-file (car *userargv*))
+
+(quit)

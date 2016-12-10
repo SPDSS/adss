@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: ADSS UI
+Bundle-SymbolicName: eu.aspire_fp7.adss.ui;singleton:=true
+Bundle-Version: 0.0.1.qualifier
+Bundle-Vendor: Politecnico di Torino
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Require-Bundle: org.eclipse.ui;bundle-version="3.7.0",
+ org.eclipse.core.resources;bundle-version="3.7.101",
+ org.eclipse.core.runtime;bundle-version="3.7.0",
+ org.eclipse.ui.ide;bundle-version="3.7.0",
+ it.polito.security.ontologies;bundle-version="0.2.0",
+ eu.aspire_fp7.adss.akb;bundle-version="0.0.1"
+Bundle-Activator: eu.aspire_fp7.adss.ui.Activator
+Export-Package: eu.aspire_fp7.adss.ui

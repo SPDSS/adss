@@ -1,0 +1,31 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: ADSS Core
+Bundle-SymbolicName: eu.aspire_fp7.adss;singleton:=true
+Bundle-Version: 0.0.1.qualifier
+Bundle-ClassPath: .,
+ lib/commons-io-2.4.jar,
+ lib/jsch-0.1.53.jar,
+ lib/cplex.jar,
+ lib/jeval.jar,
+ lib/Jama-1.0.3.jar,
+ lib/least-squares.jar,
+ lib/jpl.jar,
+ lib/gson-2.6.1.jar
+Bundle-Vendor: Politecnico di Torino
+Bundle-Localization: plugin
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.emf.ecore;visibility:=reexport,
+ org.eclipse.xtext.xbase.lib;visibility:=reexport,
+ eu.aspire_fp7.adss.akb;bundle-version="0.0.1",
+ eu.aspire_fp7.adss.util;bundle-version="0.0.1",
+ org.eclipse.core.resources;bundle-version="3.7.101",
+ it.polito.security.ontologies;bundle-version="0.2.0",
+ org.eclipse.cdt.core;bundle-version="5.11.0",
+ org.apache.log4j;bundle-version="1.2.15",
+ org.apache.commons.logging;bundle-version="1.1.1",
+ org.uel.aspire.wp5.assessment;bundle-version="1.0.0"
+Bundle-ActivationPolicy: lazy
+Export-Package: eu.aspire_fp7.adss,
+ eu.aspire_fp7.adss.connectors

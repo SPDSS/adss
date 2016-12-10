@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Ontology Tools
+Bundle-SymbolicName: it.polito.security.ontologies.tools;singleton:=true
+Bundle-Version: 0.0.1.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Require-Bundle: org.eclipse.ui;bundle-version="3.7.0",
+ org.eclipse.core.runtime;bundle-version="3.7.0",
+ it.polito.security.ontologies;bundle-version="0.2.0"
+Bundle-Vendor: Politecnico di Torino

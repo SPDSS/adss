@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+
+	Data obfuscation protection instantiation - ver 0.1 - 04-21-2016
+	Author: FBK (tiella@fbk.eu)
+
+	General notation:
+		- some overhead values are marked with a comment TBV which means To Be Validated.		
+		- range(variable) is a number so that along any execution of the program it holds that: abs(variable) <= range(variable)
+		- x^y means x to the power of y
+
+-->
+
+<protectionInstantiationsList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://protectionInstantiation.akb.adss.aspire_fp7.eu">
+   
+    <!-- xor masking ver 1, random value controlled by the ADSS 
+    
+    - #random#  must be a positive integer <= 2^sizeof(variable)-1
+    
+    -->
+    
+    <protectionInstantiation>
+        <protectionInstantiationName>xor-adss-rnd</protectionInstantiationName>
+        <protectionName>dataObfuscation</protectionName>
+        <variableAnnotation>xor, mask(constant(#random#))</variableAnnotation>
+        <toolForDeployment>TXL</toolForDeployment>
+        <clientTimeOverhead>1.05</clientTimeOverhead>
+        <clientMemoryOverhead>1.0</clientMemoryOverhead>
+        <networkOverhead>1.0</networkOverhead>
+    </protectionInstantiation>
+    
+    <!-- xor masking ver 2, random value controlled by the tool -->
+    
+    <protectionInstantiation>
+        <protectionInstantiationName>xor-rnd</protectionInstantiationName>
+        <protectionName>dataObfuscation</protectionName>
+        <variableAnnotation>xor, mask(random())</variableAnnotation>
+        <toolForDeployment>TXL</toolForDeployment>
+        <clientTimeOverhead>1.05</clientTimeOverhead>
+        <clientMemoryOverhead>1.0</clientMemoryOverhead>
+        <networkOverhead>1.0</networkOverhead>
+    </protectionInstantiation>
+    
+    <!-- xor masking ver 3, opaque constants 
+    
+    - #vars# an integer number >= 4, keep it small (i.e. fix it to 4)
+	- #random#  must be a positive integer <= 2^sizeof(variable)-1
+    - #nbits# = sizeof(#random#)
+    
+    -->
+    
+   <protectionInstantiation>
+        <protectionInstantiationName>xor-adss-rnd-opaque</protectionInstantiationName>
+        <protectionName>dataObfuscation</protectionName>
+        <variableAnnotation>xor,mask(constant(#random#)),opaque(clique,#vars#,#nbits#)</variableAnnotation>
+        <toolForDeployment>TXL</toolForDeployment>
+        <clientTimeOverhead>1.05 <!-- TBV --></clientTimeOverhead>
+        <clientMemoryOverhead>1.0<!-- TBV --></clientMemoryOverhead>
+        <networkOverhead>1.0</networkOverhead>
+    </protectionInstantiation>
+
+    
+    <!-- xor masking ver 4, dynamic -->
+    
+    <protectionInstantiation>
+        <protectionInstantiationName>xor-dynamic</protectionInstantiationName>
+        <protectionName>dataObfuscation</protectionName>
+        <variableAnnotation>xor, mask(dynamic)</variableAnnotation>
+        <toolForDeployment>TXL</toolForDeployment>
+        <clientTimeOverhead>1.05<!-- TVB--></clientTimeOverhead>
+        <clientMemoryOverhead>1.0<!-- TVB--></clientMemoryOverhead>
+        <networkOverhead>1.0</networkOverhead>
+    </protectionInstantiation>
+    
+    <!-- merge variables:
+    
+    #set_id# is an identifier that specifies which variables are bounded together
+    #pair_id# is an integer number in {1,2} that specifies the position of a variable in a bit set
+    #size# must satisfy range(variable) <= 2^#size#
+    #offset# is usually takes an 2^(#size#/2)
+    
+     -->
+    <protectionInstantiation>
+        <protectionInstantiationName>mergevar</protectionInstantiationName>
+        <protectionName>dataObfuscation</protectionName>
+        <variableAnnotation>merge_vars, set(#set_id#),coord(#pair_id#),size(#size#),offset(#offset#)</variableAnnotation> 
+        <toolForDeployment>TXL</toolForDeployment>
+        <clientTimeOverhead>1.15</clientTimeOverhead>
+        <clientMemoryOverhead>1.0</clientMemoryOverhead>
+        <networkOverhead>1.0</networkOverhead>
+    </protectionInstantiation>
+    
+    <!-- Residue number coding ver 1 - random values decided by the adss
+    
+		#random_1# and #random_2# are two integers that satisfy:
+		
+		1. GCD(#random_1#,#random_2#) = 1
+		2. range(variable) < #random_1#*#random_2#
+		
+		#def# - number of definition of the variable
+		#use# - number of (non-homomorphic) use of the variable
+		
+		
+		
+    -->
+
+    <protectionInstantiation>
+        <protectionInstantiationName>rnc-adss-rnd</protectionInstantiationName>
+        <protectionName>dataObfuscation</protectionName>
+        <variableAnnotation>rnc,base(constant(#random_1#,#random_2#))</variableAnnotation>
+        <toolForDeployment>TXL</toolForDeployment>
+        <clientTimeOverhead>2*#def#+10*#use#</clientTimeOverhead>
+        <clientMemoryOverhead>2.0</clientMemoryOverhead>
+        <networkOverhead>1.0</networkOverhead>
+    </protectionInstantiation>
+    
+    <!-- Residue number coding ver 2 - random values decided by the tool
+    
+		#min# and #max# are two integers that satisfy:
+	
+		1. range(variable) < #min#*#min#
+		2. #max#*#max# < 2^sizeof(variable)
+		3. there should be some numbers between min and max
+		
+		#def# and #use# as above
+    -->
+    
+	<protectionInstantiation>
+        <protectionInstantiationName>rnc-rnd</protectionInstantiationName>
+        <protectionName>dataObfuscation</protectionName>
+        <variableAnnotation>rnc,base(random(#min#,#max#))</variableAnnotation>
+        <toolForDeployment>TXL</toolForDeployment>
+        <clientTimeOverhead>2*#def#+10*#use#</clientTimeOverhead>
+        <clientMemoryOverhead>2.0</clientMemoryOverhead>
+        <networkOverhead>1.0</networkOverhead>
+    </protectionInstantiation>
+    
+    
+    <!--
+		Residue number coding ver. 3 - using opaque constants - base dedided by ADSS
+		
+		#random_1# and #random_2# are two integers that satisfy:
+		
+		1. GCD(#random_1#,#random_2#) = 1
+		2. range(variable) < #random_1#*#random_2#
+		
+		#bits# is max(sizeof(#random_1#),sizeof(#random_2#))
+		#vars# an integer number >=4 (keep it small, i.e. always 4 
+		#random_1# and random_2 as before
+		
+		#def# and #use# as before
+    -->
+    
+    <protectionInstantiation>
+        <protectionInstantiationName>rnc-adss-rnd-opaque</protectionInstantiationName>
+        <protectionName>dataObfuscation</protectionName>
+        <variableAnnotation>protection(rnc,base(constant(#random_1#,#random_2#)),opaque(clique,#vars#,#nbits#))</variableAnnotation>
+        <toolForDeployment>TXL</toolForDeployment>
+        <clientTimeOverhead>2*#def#+10*#use#<!-- TBV --></clientTimeOverhead>
+        <clientMemoryOverhead>2.0</clientMemoryOverhead>
+        <networkOverhead>1.0</networkOverhead>
+    </protectionInstantiation>
+    
+    
+    <!--
+		RNC ver. 4 - using opaque constants - base decided by the tool
+		
+		#random_1# and #random_2# are two integers that satisfy:
+		
+		1. GCD(#random_1#,#random_2#) = 1
+		2. range(variable) < #random_1#*#random_2#
+		
+		#bits# is max(sizeof(#random_1#),sizeof(#random_2#))
+		#vars# an integer number >=4 (keep it small, i.e. always 4)
+		#min# and #max# as before
+		#def# and #use# as before
+    -->
+    
+    <protectionInstantiation>
+        <protectionInstantiationName>rnc-rnd-opaque</protectionInstantiationName>
+        <protectionName>dataObfuscation</protectionName>
+        <variableAnnotation>protection(rnc,base(random(#min#,#max#)),opaque(clique,#vars#,#nbits#))</variableAnnotation>
+        <toolForDeployment>TXL</toolForDeployment>
+        <clientTimeOverhead>2*#def#+10*#use#<!-- TVB --></clientTimeOverhead>
+        <clientMemoryOverhead>1.0</clientMemoryOverhead>
+        <networkOverhead>1.0</networkOverhead>
+    </protectionInstantiation>
+    
+    
+    <!-- data_to_proc
+    -->
+
+    
+    <protectionInstantiation>
+        <protectionInstantiationName>Data to Procedure</protectionInstantiationName>
+        <protectionName>dataObfuscation</protectionName>
+        <variableAnnotation>protection(data_to_proc,algorithm(mealy_lutable))</variableAnnotation>
+        <toolForDeployment>TXL</toolForDeployment>
+        <clientTimeOverhead>10.0<!-- TBV --></clientTimeOverhead> 
+        <clientMemoryOverhead>2.0</clientMemoryOverhead>
+        <networkOverhead>1.0</networkOverhead>
+    </protectionInstantiation>
+   
+</protectionInstantiationsList>
+

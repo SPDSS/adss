@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://protectionInstantiation.akb.adss.aspire_fp7.eu" xmlns:tns="http://protectionInstantiation.akb.adss.aspire_fp7.eu" elementFormDefault="qualified">
+
+    <element name="protectionInstantiationsList">
+	    <complexType>
+	    	<sequence maxOccurs="unbounded" minOccurs="0">
+	    		<element name="protectionInstantiation">
+	    		    <complexType>
+				    	<sequence maxOccurs="1" minOccurs="1">
+				    		<element name="protectionInstantiationName" type="string" minOccurs="1" maxOccurs="1"></element>
+				    		<element name="protectionName" minOccurs="1" maxOccurs="1">
+				    			<simpleType>
+				    				<restriction base="string">
+				    					<enumeration value="dataObfuscation"/>
+				    					<enumeration value="multiThreadedCryptography"/>
+				    					<enumeration value="softwareTimeBomb"/>
+				    					<enumeration value="whiteBoxCryptography"/>
+				    					<enumeration value="softVM"/>
+				    					<enumeration value="antiDebugging"/>
+				    					<enumeration value="callStackChecks"/>
+				    					<enumeration value="codeGuards"/>
+				    					<enumeration value="binaryCodeControlFlowObfuscation"/>
+				    					<enumeration value="clientServerSplitting"/>
+				    					<enumeration value="codeMobility"/>
+				    					<enumeration value="staticRemoteAttestation"/>
+				    					<enumeration value="controlFlowGraphTagging"/>
+				    					<enumeration value="antiCloning"/>
+				    				</restriction>
+				    			</simpleType>
+				    		</element>
+				    		<element name="variableAnnotation" type="string" maxOccurs="1" minOccurs="0"/>
+				    		<element name="codeRegionAnnotation" type="string" maxOccurs="1" minOccurs="0"/>
+				    		<element name="attestatorAnnotation" type="string" maxOccurs="1" minOccurs="0"/>
+				    		<element name="verifierAnnotation" type="string" maxOccurs="1" minOccurs="0"/>
+				    		<element name="toolForDeployment" type="string" minOccurs="1" maxOccurs="unbounded"/>
+				    		<element name="clientTimeOverhead" type="string" minOccurs="1" maxOccurs="1" />
+				    		<element name="clientMemoryOverhead" type="string" minOccurs="1" maxOccurs="1"/>
+				    		<element name="serverTimeOverhead" type="string" minOccurs="0" maxOccurs="1"/>
+				    		<element name="serverMemoryOverhead" type="string" minOccurs="0" maxOccurs="1"/>
+				    		<element name="networkOverhead" type="string" minOccurs="1" maxOccurs="1"/>
+				    	</sequence>
+				    </complexType>
+	    		</element>
+	    	</sequence>
+	    </complexType>    
+    </element>
+</schema>

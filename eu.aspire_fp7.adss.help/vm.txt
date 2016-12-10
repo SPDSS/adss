@@ -1,0 +1,78 @@
+HOW TO CREATE A WORKING VIRTUAL MACHINE WITH THE ADSS
+-----------------------------------------------------
+
+1. download https://aspire-fp7.eu/repo/AspireVM.vmdk
+2. in VirtualBox create a new virtual machine
+	a. allocate enough RAM (>= 2 GiB should suffice)
+	b. allocate several CPU cores if possible (>= 2 should suffice)
+	c. allocate enough video memory (>= 128 MiB should suffice)
+	d. add another SATA hard disk (VMDK, dynamic, no split files, >= 32 GiB should suffice)
+	e. [optional] share one or more host folders with the virtual machine
+3. boot the virtual machine
+4. log in with username "aspire" and password "aspire"
+5. update the stock packages by executing
+	sudo apt-get update
+	sudo apt-get dist-upgrade
+6. install the ASPIRE packages by executing "sudo ./runfirst" in the home directory
+	a. install Gnome or KDE (I've installed Gnome, but also KDE should be fine)
+	b. CodeSurfer license server hostname: svn-sec.polito.it
+	c. CodeSurfer license server port: 7350
+7. [optional] install the guest additions by inserting the CD image in VirtualBox and executing
+	sudo apt-get install -y linux-headers-$(uname -r)
+	sudo mount /dev/cdrom /media/cdrom
+	sudo sh /media/cdrom/VBoxLinuxAdditions.run
+	sudo reboot
+8. install some new packages by executing
+	sudo apt-get install nano subversion
+9. move the home directory to a separate disk by executing
+	sudo -i
+	cd /
+	fdisk /dev/sdb
+		launch the command n with the default parameters
+		launch the command w
+	mkfs -t ext4 /dev/sdb1
+	mv /home /home.bak
+	mkdir /home
+	mount /dev/sdb1 /home
+	cp -a /home.bak/* /home
+	blkid /dev/sdb1 (and note the UUID)
+	nano /etc/fstab
+		add a line "UUID=<UUID> /home ext4 relatime,errors=remount-ro 0 1"
+	reboot
+10. set the timezone by executing "sudo dpkg-reconfigure tzdata"
+11. check out the framework repository by executing "svn co https://aspire-fp7.eu/framework"
+12. update the ASPIRE stuff by executing
+	cd framework
+	sudo ./update-vm.sh
+13. download the use cases source code by executing
+	svn co https://aspire-fp7.eu/svn/Work-Packages/WP6-Use-Cases/
+14. create the symbolic links by executing
+	cd framework
+	./select-tool-version.sh -t 3rd_party -v development
+	./select-tool-version.sh -t ACCL -v testing
+	./select-tool-version.sh -t ACTC -v testing
+	./select-tool-version.sh -t annotation_extractor -v stable
+	./select-tool-version.sh -t anti_cloning -v development
+	./select-tool-version.sh -t ASCL -v testing
+	./select-tool-version.sh -t client_server_splitter -v testing
+	./select-tool-version.sh -t codeguard -v development
+	./select-tool-version.sh -t data_obfuscator -v stable
+	./select-tool-version.sh -t diablo -v testing
+	./select-tool-version.sh -t RA -v testing
+	./select-tool-version.sh -t wbc -v testing
+	./select-tool-version.sh -t xtranslator -v testing
+15. install other stuff by executing
+	framework/development/ACTC/3rd_party_tools/install.sh
+16. replace "wheezy" with "jessie" in /etc/apt/sources.list by launching
+	sudo nano /etc/apt/sources.list
+17. upgrade everything by executing
+	sudo apt-get update
+	sudo apt-get dist-upgrade
+18. [optional] reinstall the VirtualBox guest additions (point 7)
+19. launch sudo update-alternatives --config diablo-gcc-toolchain and pick a gcc >= 4.8.x
+20. replace /opt/codesurfer with CodeSurfer 2.3
+21. in VirtualBox configure the VM network settings adding the port forwarding TCP 127.0.1.1:3022 to 10.0.2.15:22
+22. run sudo aptitude install openssl-dev libcurl4-openssl-dev
+23. apt-get install python-pyparsing libfile-slurp-perl libjson-perl
+24. create a symbolic link by executing 
+    sudo ln -s /opt/ACTC/main/src/actc.py /opt/ACTC/actc.py

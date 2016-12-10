@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+
+	client/server splitter protection instantiation - ver 0.1 - 04-29-2016
+	Author: FBK (anavancini@fbk.eu)
+
+	General notation:
+		- some overhead values are marked with a comment TBV which means To Be Validated
+-->
+
+<protectionInstantiationsList xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://protectionInstantiation.akb.adss.aspire_fp7.eu">
+   
+    <!-- client/server splitter 
+        added an extra VariableAnnotation field to handle barrier definitions
+        #bar_vars# is a list of identifiers (barrier variables)
+        #crit_vars# is a list of identifiers (criterion variables)
+        #label# is a string that should be specified to couple criterion and barrier annotations
+        
+        #def_use#, #def_crit_vars#, #use_crit_vars# must be positive integers, which indicate
+        - #def_use#: number of def-use chains which definition occurs outside the annotated code block and use is inside the code block
+        - #def_crit_vars#: number of definitions of criterion variables that appear in the code block
+        - #use_crit_vars#: number of uses of criterion variables that appear outside the code block and depend on definitions inside the code block
+     
+        - ex:
+           1    x = 15
+                ...
+                ANNOT_C(y)
+           7    y = x;
+                ANNOT_C_END
+                ...
+     
+           11   z = y;
+            
+            #def_use# = 1 (line 1, x = 15 (def of x), line 7, y = x (use of x))
+            #def_crit_vars# = 1 (line 7, y = x (def of y))
+            #use_crit_vars# = 1 (line 11, z = y (use of y))
+     
+        nb for simplicity, lets assume that the code block is the one annotated with criterion annotations
+        nb2 clientTimeOverhead gives you the performance overhead you get by applying the splitter (ex ClientTimeOverhead = 100 means app is 100 time slower than the original)
+        nb3 networkOverhead gives you the absolute number of messages the app sends through the network
+     
+    -->
+    
+    <protectionInstantiation>
+        <protectionInstantiationName>barrier_slicing</protectionInstantiationName>
+        <protectionName>clientServerSplitting</protectionName>
+        <variableAnnotation>protection (barrier_slicing, barrier(#barr_vars#), label(#label#))</variableAnnotation>
+        <variableAnnotation>protection (barrier_slicing, criterion(#crit_vars#), label(#label#))</variableAnnotation>
+        <toolForDeployment>CodeSurfer, TXL</toolForDeployment>
+        <clientTimeOverhead>1.0 + (0.1*(2 + #def_use# + #def_crit_vars# + #use_crit_vars#))<!-- TBV see comment nb2 above --></clientTimeOverhead>
+        <clientMemoryOverhead>1.2</clientMemoryOverhead>
+        <networkOverhead>(2 + #def_barr_vars# + #def_crit_vars# + #def_extra_vars# + #use_crit_vars#)<!-- TBV see comment nb3 above --></networkOverhead>
+    </protectionInstantiation>
+    
+</protectionInstantiationsList>
+
